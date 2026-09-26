@@ -4,12 +4,203 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>수행평가 작업실</title>
-<link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#16211A" />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&display=swap" />
-<link rel="stylesheet" href="css/style.css" />
+<style>
+:root{
+  --ink:#16211A;
+  --ink-soft:#3C463E;
+  --paper:#F5F6F0;
+  --paper-raised:#FFFFFF;
+  --line:#DEDCCF;
+  --amber:#C97A2B;
+  --amber-soft:#F2E1CC;
+  --teal:#2F6F5E;
+  --teal-soft:#DCEAE4;
+  --danger:#B5482A;
+  --radius:10px;
+  --serif:"Noto Serif KR", serif;
+  --sans:"Pretendard", -apple-system, "Apple SD Gothic Neo", sans-serif;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  line-height:1.5;
+  padding-bottom:60px;
+}
+
+h1,h2{font-family:var(--serif); margin:0; font-weight:700;}
+h2{font-size:1.15rem; margin-bottom:14px; letter-spacing:-0.01em;}
+
+.topbar{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:22px 28px 18px;
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex; align-items:center; gap:14px;}
+.brand-mark{
+  font-family:var(--serif); font-size:1.6rem;
+  width:44px; height:44px; border-radius:50%;
+  background:var(--ink); color:var(--paper);
+  display:flex; align-items:center; justify-content:center;
+}
+.brand h1{font-size:1.35rem;}
+.tagline{margin:2px 0 0; font-size:0.85rem; color:var(--ink-soft);}
+.topbar-actions{display:flex; gap:8px;}
+
+.ghost-btn{
+  background:transparent; border:1px solid var(--line); border-radius:999px;
+  padding:8px 14px; font-size:0.85rem; cursor:pointer; color:var(--ink);
+  font-family:var(--sans);
+}
+.ghost-btn:hover{border-color:var(--ink);}
+
+.tabs{
+  display:flex; gap:4px; padding:14px 28px 0; border-bottom:1px solid var(--line);
+}
+.tab-btn{
+  background:none; border:none; padding:10px 4px; margin-right:22px;
+  font-family:var(--sans); font-size:0.95rem; color:var(--ink-soft);
+  border-bottom:2px solid transparent; cursor:pointer;
+}
+.tab-btn.active{ color:var(--ink); border-bottom-color:var(--amber); font-weight:600;}
+
+main{max-width:880px; margin:0 auto; padding:26px 24px 60px;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+.stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px;}
+.stat-card{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
+  padding:16px; display:flex; flex-direction:column; gap:4px;
+}
+.stat-num{font-family:var(--serif); font-size:1.9rem;}
+.stat-label{font-size:0.8rem; color:var(--ink-soft);}
+.stat-card.stat-warn{border-color:var(--amber); background:var(--amber-soft);}
+.stat-card.stat-warn .stat-num{color:var(--amber);}
+.stat-card.stat-done{border-color:var(--teal); background:var(--teal-soft);}
+.stat-card.stat-done .stat-num{color:var(--teal);}
+
+.board-list{display:flex; flex-direction:column; gap:12px;}
+.board-item{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
+  padding:16px 18px;
+}
+.board-item.urgent{border-left:4px solid var(--amber);}
+.board-item.done{opacity:0.62;}
+.board-item-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+.board-item-title{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.chip{
+  font-size:0.72rem; padding:3px 9px; border-radius:999px; background:var(--ink);
+  color:var(--paper); white-space:nowrap;
+}
+.chip.subject{background:var(--ink-soft);}
+.chip.type-writing{background:#5C4A8A;}
+.chip.type-presentation{background:#2F6F5E;}
+.chip.type-experiment{background:#B5482A;}
+.chip.type-etc{background:#6B6B5E;}
+.dday{font-size:0.78rem; font-weight:700; padding:3px 10px; border-radius:999px;}
+.dday.soon{background:var(--amber); color:#fff;}
+.dday.normal{background:var(--line); color:var(--ink-soft);}
+.dday.past{background:#eee; color:#999;}
+.board-item h3{margin:8px 0 4px; font-size:1.02rem; font-family:var(--sans); font-weight:600;}
+.board-item p{margin:0; font-size:0.88rem; color:var(--ink-soft);}
+
+.progress-row{display:flex; align-items:center; gap:10px; margin-top:12px;}
+.progress-bar{flex:1; height:7px; background:var(--line); border-radius:99px; overflow:hidden;}
+.progress-bar > span{display:block; height:100%; background:var(--teal);}
+.progress-pct{font-size:0.78rem; color:var(--ink-soft); width:38px; text-align:right;}
+
+.checklist{margin-top:12px; display:flex; flex-direction:column; gap:6px;}
+.checklist label{
+  display:flex; align-items:flex-start; gap:8px; font-size:0.87rem; cursor:pointer;
+  font-weight:400;
+}
+.checklist input{margin-top:3px;}
+
+.item-actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+.item-actions button{font-size:0.8rem;}
+
+.form-card{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
+  padding:22px;
+}
+label{display:block; font-size:0.85rem; font-weight:600; margin-bottom:14px; color:var(--ink);}
+input[type=text], input[type=date], input[type=password], select, textarea, input[type=file]{
+  display:block; width:100%; margin-top:6px; padding:10px 12px;
+  border:1px solid var(--line); border-radius:8px; font-family:var(--sans); font-size:0.92rem;
+  background:#fff; color:var(--ink);
+}
+textarea{resize:vertical;}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.file-status{font-size:0.8rem; color:var(--teal); min-height:1em; margin-top:-8px;}
+
+.primary-btn, .accent-btn{
+  border:none; border-radius:8px; padding:12px 18px; font-size:0.92rem; font-weight:600;
+  cursor:pointer; font-family:var(--sans); margin-right:10px; margin-top:4px;
+}
+.primary-btn{background:var(--ink); color:var(--paper);}
+.accent-btn{background:var(--amber); color:#fff;}
+.primary-btn:hover{background:var(--ink-soft);}
+.accent-btn:hover{filter:brightness(1.05);}
+.link-btn{background:none; border:none; color:var(--amber); font-weight:600; cursor:pointer; font-family:var(--sans); padding:0;}
+
+.muted{color:var(--ink-soft); font-size:0.87rem;}
+.warn-box{
+  background:var(--amber-soft); border:1px solid var(--amber); border-radius:8px;
+  padding:10px 12px; font-size:0.8rem; color:#7A4715; margin-bottom:14px;
+}
+.empty-hint{color:var(--ink-soft); font-size:0.9rem; text-align:center; padding:30px 0;}
+
+.archive-list{display:flex; flex-direction:column; gap:10px;}
+.archive-item{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
+  padding:14px 16px; cursor:pointer;
+}
+.archive-item:hover{border-color:var(--ink);}
+.archive-item-head{display:flex; justify-content:space-between; font-size:0.85rem; color:var(--ink-soft);}
+.archive-item h3{margin:6px 0 0; font-size:0.98rem; font-family:var(--sans);}
+
+.modal{
+  position:fixed; inset:0; background:rgba(22,33,26,0.45);
+  display:flex; align-items:center; justify-content:center; padding:20px; z-index:50;
+}
+.modal-box{
+  background:var(--paper); border-radius:14px; max-width:640px; width:100%;
+  max-height:86vh; display:flex; flex-direction:column; overflow:hidden;
+  border:1px solid var(--line);
+}
+.modal-box-narrow{max-width:460px;}
+.modal-head{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:18px 20px; border-bottom:1px solid var(--line);
+}
+.modal-body{padding:20px; overflow-y:auto; font-size:0.92rem;}
+.modal-body h4{font-family:var(--serif); margin:16px 0 6px;}
+.modal-body h4:first-child{margin-top:0;}
+.modal-body ul, .modal-body ol{padding-left:20px; margin:6px 0;}
+.modal-body li{margin-bottom:4px;}
+.icon-btn{background:none; border:none; font-size:1.1rem; cursor:pointer; color:var(--ink-soft);}
+.loading-line{color:var(--ink-soft); font-style:italic;}
+
+.toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  background:var(--ink); color:var(--paper); padding:11px 20px; border-radius:999px;
+  font-size:0.88rem; z-index:80;
+}
+
+@media (max-width:600px){
+  .grid-2{grid-template-columns:1fr;}
+  .stat-row{grid-template-columns:1fr; }
+  .topbar{flex-direction:column; align-items:flex-start; gap:12px;}
+}
+</style>
 </head>
 <body>
 
@@ -35,7 +226,6 @@
 
 <main>
 
-  <!-- ================= 현황판 ================= -->
   <section id="tab-board" class="tab-panel active">
     <div class="stat-row">
       <div class="stat-card">
@@ -52,16 +242,13 @@
       </div>
     </div>
 
-    <div id="board-list" class="board-list">
-      <!-- rendered by app.js -->
-    </div>
+    <div id="board-list" class="board-list"></div>
 
     <p class="empty-hint" id="board-empty" hidden>
       아직 등록된 수행평가가 없어요. <button class="link-btn" data-goto="new">여기서 하나 등록해 보세요 →</button>
     </p>
   </section>
 
-  <!-- ================= 새 수행평가 등록 ================= -->
   <section id="tab-new" class="tab-panel">
     <div class="form-card">
       <h2>1. 기본 정보</h2>
@@ -97,7 +284,6 @@
     </div>
   </section>
 
-  <!-- ================= 지난 기록 ================= -->
   <section id="tab-archive" class="tab-panel">
     <h2>AI 준비 도우미 기록</h2>
     <p class="muted">이 기기에 저장된 기록이에요. 언제든 다시 열어볼 수 있어요.</p>
@@ -107,7 +293,6 @@
 
 </main>
 
-<!-- ============ AI 결과 모달 ============ -->
 <div id="ai-modal" class="modal" hidden>
   <div class="modal-box">
     <div class="modal-head">
@@ -118,7 +303,6 @@
   </div>
 </div>
 
-<!-- ============ 설정 모달 ============ -->
 <div id="settings-modal" class="modal" hidden>
   <div class="modal-box modal-box-narrow">
     <div class="modal-head">
@@ -148,9 +332,570 @@
 <div id="toast" class="toast" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="js/store.js"></script>
-<script src="js/ai.js"></script>
-<script src="js/notifications.js"></script>
-<script src="js/app.js"></script>
+<script>
+/* ===================== store (localStorage) ===================== */
+const Store = (() => {
+  const KEYS = {
+    assessments: "ap_assessments",
+    history: "ap_history",
+    settings: "ap_settings",
+    notified: "ap_notified",
+  };
+  function read(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      console.error("저장소 읽기 실패:", key, e);
+      return fallback;
+    }
+  }
+  function write(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+
+  function getAssessments() { return read(KEYS.assessments, []); }
+  function saveAssessment(assessment) {
+    const all = getAssessments();
+    const idx = all.findIndex((a) => a.id === assessment.id);
+    if (idx >= 0) all[idx] = assessment; else all.push(assessment);
+    write(KEYS.assessments, all);
+    return assessment;
+  }
+  function deleteAssessment(id) { write(KEYS.assessments, getAssessments().filter((a) => a.id !== id)); }
+  function getAssessment(id) { return getAssessments().find((a) => a.id === id) || null; }
+
+  function getHistory() { return read(KEYS.history, []); }
+  function addHistory(entry) {
+    const all = getHistory();
+    all.unshift(entry);
+    write(KEYS.history, all);
+    return entry;
+  }
+
+  function getSettings() { return read(KEYS.settings, { apiKey: "" }); }
+  function saveSettings(settings) { write(KEYS.settings, settings); }
+
+  function getNotified() { return read(KEYS.notified, {}); }
+  function markNotified(assessmentId, dayKey) {
+    const n = getNotified();
+    n[assessmentId] = dayKey;
+    write(KEYS.notified, n);
+  }
+
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+  return {
+    getAssessments, saveAssessment, deleteAssessment, getAssessment,
+    getHistory, addHistory,
+    getSettings, saveSettings,
+    getNotified, markNotified,
+    uid,
+  };
+})();
+
+/* ===================== AI (Gemini) ===================== */
+const AI = (() => {
+  const TYPE_LABEL = {
+    writing: "글쓰기 · 서술형",
+    presentation: "발표",
+    experiment: "실험 · 탐구",
+    etc: "기타",
+  };
+
+  const TYPE_INSTRUCTIONS = {
+    writing: `이 학생은 글쓰기/서술형 수행평가를 준비하고 있습니다.
+- 먼저 서론-본론-결론 구조의 글쓰기 아웃라인을 문단별 핵심 문장과 함께 제시하세요.
+- 채점자가 좋아할 만한 논거 배치, 인용/근거 넣을 위치를 짚어주세요.
+- 마감일까지 남은 일수에 맞춰 "초안 작성 → 퇴고 → 분량/형식 점검" 단계별 준비 일정을 짜주세요.
+- 흔한 감점 요인(주제 이탈, 분량 미달, 결론 없이 끝남 등)을 피드백으로 알려주세요.`,
+    presentation: `이 학생은 발표 수행평가를 준비하고 있습니다.
+- 도입(주의 환기)-본론(핵심 근거 2~3개)-결론(요약/마무리 멘트) 구조로 발표 개요를 짜주세요.
+- 슬라이드가 필요하다면 슬라이드별로 들어갈 내용을 한 줄씩 제시하세요.
+- 제한 시간이 언급되어 있다면 그 시간에 맞춘 분량으로 조절하세요.
+- 마감일까지 "자료조사 → 대본 작성 → 리허설 → 시간 체크" 단계별 준비 일정을 짜주세요.
+- 발표 특유의 감점 요인(시간 초과, 눈맞춤 없이 읽기, 근거 부족)에 대한 피드백을 주세요.`,
+    experiment: `이 학생은 실험/탐구 수행평가를 준비하고 있습니다.
+- 실험의 가설-준비물-절차-예상 결과-주의사항을 항목별로 정리하세요.
+- 보고서를 쓴다면 보고서 목차(가설/방법/결과/고찰)도 함께 제시하세요.
+- 마감일까지 "준비물 확인 → 실험/관찰 → 결과 정리 → 보고서 작성" 단계별 준비 일정을 짜주세요.
+- 실험 특유의 감점 요인(안전수칙 누락, 변인 통제 실패, 고찰 부실)에 대한 피드백을 주세요.`,
+    etc: `이 학생은 위 내용의 수행평가를 준비하고 있습니다.
+- 과제 내용을 분석해서 요구사항을 항목별로 정리하세요.
+- 마감일까지 남은 일수에 맞춰 단계별 준비 일정을 짜주세요.
+- 놓치기 쉬운 감점 요인에 대한 피드백을 주세요.`,
+  };
+
+  function buildPrompt(assessment, extraSourceText) {
+    const daysLeft = daysUntil(assessment.due);
+    return `너는 한국 고등학생의 수행평가 준비를 도와주는 선생님이야. 아래 정보를 바탕으로 답해줘.
+
+[과목] ${assessment.subject || "미상"}
+[제목] ${assessment.title || "미상"}
+[유형] ${TYPE_LABEL[assessment.type] || "기타"}
+[마감일까지 남은 일수] ${daysLeft}일
+[안내 내용]
+${assessment.desc || "(안내 내용 없음)"}
+${extraSourceText ? `\n[업로드된 유인물/자료 내용]\n${extraSourceText.slice(0, 6000)}` : ""}
+
+${TYPE_INSTRUCTIONS[assessment.type] || TYPE_INSTRUCTIONS.etc}
+
+반드시 아래 형식의 순수 JSON 객체 하나만 출력해. 코드블록, 설명, 다른 텍스트를 절대 붙이지 마.
+{
+  "outline": "마크다운 형식의 아웃라인/구조 (## 소제목 사용 가능)",
+  "schedule": [ {"label": "짧은 단계 이름", "detail": "무엇을 할지 한 줄 설명"} ],
+  "feedback": "이 유형에서 흔히 감점되는 부분과 이번 과제에서 특히 주의할 점 (2~4문장)"
+}
+"schedule" 배열은 남은 일수에 맞춰 2~5단계로 구성해줘.`;
+  }
+
+  function daysUntil(dueStr) {
+    if (!dueStr) return "미정";
+    const due = new Date(dueStr + "T00:00:00");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Math.round((due - today) / 86400000);
+  }
+
+  // 무료 등급 모델. Google이 모델명을 바꾸면 이 값만 교체하면 됩니다.
+  const GEMINI_MODEL = "gemini-3.1-flash-lite";
+
+  async function callGemini(prompt) {
+    const { apiKey } = Store.getSettings();
+    if (!apiKey) throw new Error("NO_API_KEY");
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.7 },
+      }),
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`API_ERROR_${res.status}: ${text.slice(0, 300)}`);
+    }
+    const data = await res.json();
+    const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("\n").trim();
+    if (!text) throw new Error("API_ERROR_EMPTY: 모델이 빈 응답을 반환했어요.");
+    return parseJsonReply(text);
+  }
+
+  function parseJsonReply(text) {
+    const cleaned = text.replace(/^```json/i, "").replace(/```$/, "").trim();
+    try { return JSON.parse(cleaned); }
+    catch (e) { return { outline: text, schedule: [], feedback: "" }; }
+  }
+
+  async function prepareAssessment(assessment, extraSourceText) {
+    const prompt = buildPrompt(assessment, extraSourceText);
+    return await callGemini(prompt);
+  }
+
+  async function extractFileText(file) {
+    if (!file) return "";
+    if (file.type === "text/plain" || file.name.endsWith(".txt")) return await file.text();
+    if (file.type === "application/pdf" || file.name.endsWith(".pdf")) return await extractPdfText(file);
+    return "";
+  }
+
+  async function extractPdfText(file) {
+    if (typeof pdfjsLib === "undefined") return "";
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let out = "";
+    const maxPages = Math.min(pdf.numPages, 10);
+    for (let i = 1; i <= maxPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      out += content.items.map((it) => it.str).join(" ") + "\n";
+    }
+    return out;
+  }
+
+  return { prepareAssessment, extractFileText, daysUntil, TYPE_LABEL };
+})();
+
+/* ===================== notifications ===================== */
+const Notifier = (() => {
+  function init() {
+    checkAll();
+    setInterval(checkAll, 30 * 60 * 1000);
+  }
+  async function requestPermission() {
+    if (!("Notification" in window)) { alert("이 브라우저는 알림을 지원하지 않아요."); return false; }
+    const perm = await Notification.requestPermission();
+    return perm === "granted";
+  }
+  function fire(title, body) {
+    if (Notification.permission !== "granted") return;
+    new Notification(title, { body });
+  }
+  function todayKey() { return new Date().toISOString().slice(0, 10); }
+  function checkAll() {
+    if (!("Notification" in window) || Notification.permission !== "granted") return;
+    const assessments = Store.getAssessments();
+    const notified = Store.getNotified();
+    const key = todayKey();
+    assessments.forEach((a) => {
+      if (a.status === "done") return;
+      const d = AI.daysUntil(a.due);
+      if (d === 2 && notified[a.id] !== key) {
+        fire(`D-2 · ${a.subject || "수행평가"}`, `${a.title || "제목 없음"} 이(가) 이틀 뒤예요. 지금 준비 상황을 확인해 보세요.`);
+        Store.markNotified(a.id, key);
+      }
+    });
+  }
+  return { init, requestPermission, checkAll };
+})();
+
+/* ===================== app (UI) ===================== */
+document.addEventListener("DOMContentLoaded", () => {
+  Notifier.init();
+  bindTabs();
+  bindSettings();
+  bindNotifButton();
+  bindForm();
+  bindModals();
+  renderBoard();
+  renderArchive();
+});
+
+function bindTabs() {
+  document.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+  });
+  document.querySelectorAll("[data-goto]").forEach((btn) => {
+    btn.addEventListener("click", () => switchTab(btn.dataset.goto));
+  });
+}
+function switchTab(name) {
+  document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
+  document.querySelectorAll(".tab-panel").forEach((p) => p.classList.toggle("active", p.id === `tab-${name}`));
+}
+
+function bindSettings() {
+  const modal = document.getElementById("settings-modal");
+  document.getElementById("btn-settings").addEventListener("click", () => {
+    document.getElementById("f-apikey").value = Store.getSettings().apiKey || "";
+    modal.hidden = false;
+  });
+  document.getElementById("settings-modal-close").addEventListener("click", () => (modal.hidden = true));
+  document.getElementById("btn-save-key").addEventListener("click", () => {
+    const key = document.getElementById("f-apikey").value.trim();
+    Store.saveSettings({ apiKey: key });
+    modal.hidden = true;
+    showToast("API 키를 저장했어요.");
+  });
+}
+
+function bindNotifButton() {
+  const btn = document.getElementById("btn-notif");
+  btn.addEventListener("click", async () => {
+    const ok = await Notifier.requestPermission();
+    if (ok) {
+      btn.textContent = "🔔 알림 켜짐";
+      Notifier.checkAll();
+      showToast("D-2 알림을 켰어요. 이 브라우저를 열어두면 알려드려요.");
+    } else {
+      showToast("알림 권한이 꺼져 있어요. 브라우저 설정에서 허용해 주세요.");
+    }
+  });
+  if ("Notification" in window && Notification.permission === "granted") btn.textContent = "🔔 알림 켜짐";
+}
+
+function bindForm() {
+  const fileInput = document.getElementById("f-file");
+  fileInput.addEventListener("change", () => {
+    const f = fileInput.files[0];
+    document.getElementById("file-status").textContent = f ? `첨부됨: ${f.name}` : "";
+  });
+  document.getElementById("btn-save").addEventListener("click", async () => { await saveFromForm(false); });
+  document.getElementById("btn-save-analyze").addEventListener("click", async () => { await saveFromForm(true); });
+}
+
+function readForm() {
+  return {
+    subject: document.getElementById("f-subject").value.trim(),
+    type: document.getElementById("f-type").value,
+    title: document.getElementById("f-title").value.trim(),
+    due: document.getElementById("f-due").value,
+    desc: document.getElementById("f-desc").value.trim(),
+  };
+}
+function clearForm() {
+  ["f-subject", "f-title", "f-due", "f-desc"].forEach((id) => (document.getElementById(id).value = ""));
+  document.getElementById("f-type").selectedIndex = 0;
+  document.getElementById("f-file").value = "";
+  document.getElementById("file-status").textContent = "";
+}
+
+async function saveFromForm(runAI) {
+  const form = readForm();
+  if (!form.title) { showToast("제목을 입력해 주세요."); return; }
+  const assessment = { id: Store.uid(), ...form, checklist: [], status: "active", createdAt: new Date().toISOString() };
+  Store.saveAssessment(assessment);
+  const file = document.getElementById("f-file").files[0];
+  clearForm();
+  renderBoard();
+  switchTab("board");
+  showToast("수행평가를 등록했어요.");
+
+  if (runAI) {
+    let fileText = "";
+    if (file) {
+      showToast("첨부 파일을 읽는 중...");
+      try { fileText = await AI.extractFileText(file); } catch (e) { console.error(e); }
+    }
+    await runAssistant(assessment.id, fileText);
+  }
+}
+
+function renderBoard() {
+  const all = Store.getAssessments();
+  const list = document.getElementById("board-list");
+  const empty = document.getElementById("board-empty");
+  list.innerHTML = "";
+  empty.hidden = all.length > 0;
+
+  document.getElementById("stat-total").textContent = all.length;
+  document.getElementById("stat-soon").textContent = all.filter(
+    (a) => a.status !== "done" && typeof AI.daysUntil(a.due) === "number" && AI.daysUntil(a.due) <= 3 && AI.daysUntil(a.due) >= 0
+  ).length;
+  document.getElementById("stat-done").textContent = all.filter((a) => a.status === "done").length;
+
+  const sorted = [...all].sort((a, b) => {
+    const da = a.due ? new Date(a.due) : new Date("2999-01-01");
+    const db = b.due ? new Date(b.due) : new Date("2999-01-01");
+    return da - db;
+  });
+  sorted.forEach((a) => list.appendChild(renderBoardItem(a)));
+}
+
+function renderBoardItem(a) {
+  const el = document.createElement("div");
+  const d = AI.daysUntil(a.due);
+  const isUrgent = typeof d === "number" && d <= 2 && d >= 0 && a.status !== "done";
+  el.className = "board-item" + (isUrgent ? " urgent" : "") + (a.status === "done" ? " done" : "");
+
+  const total = a.checklist.length;
+  const doneCount = a.checklist.filter((c) => c.done).length;
+  const pct = total ? Math.round((doneCount / total) * 100) : 0;
+
+  el.innerHTML = `
+    <div class="board-item-head">
+      <div class="board-item-title">
+        ${a.subject ? `<span class="chip subject">${escapeHtml(a.subject)}</span>` : ""}
+        <span class="chip type-${a.type}">${AI.TYPE_LABEL[a.type] || "기타"}</span>
+      </div>
+      <span class="dday ${badgeClass(d, a.status)}">${ddayLabel(d, a.status)}</span>
+    </div>
+    <h3>${escapeHtml(a.title)}</h3>
+    ${a.desc ? `<p>${escapeHtml(a.desc)}</p>` : ""}
+    ${total ? `
+      <div class="progress-row">
+        <div class="progress-bar"><span style="width:${pct}%"></span></div>
+        <span class="progress-pct">${pct}%</span>
+      </div>
+      <div class="checklist">
+        ${a.checklist.map((c) => `
+          <label>
+            <input type="checkbox" data-assessment="${a.id}" data-item="${c.id}" ${c.done ? "checked" : ""}/>
+            <span><strong>${escapeHtml(c.label)}</strong>${c.detail ? " — " + escapeHtml(c.detail) : ""}</span>
+          </label>`).join("")}
+      </div>` : `<p class="muted">아직 준비 일정이 없어요. 아래 버튼으로 AI 도우미를 실행해 보세요.</p>`}
+    <div class="item-actions">
+      <button class="ghost-btn" data-action="ai" data-id="${a.id}">✨ AI 준비 도우미</button>
+      ${a.status !== "done" ? `<button class="ghost-btn" data-action="done" data-id="${a.id}">완료로 표시</button>` : `<button class="ghost-btn" data-action="undone" data-id="${a.id}">완료 취소</button>`}
+      <button class="ghost-btn" data-action="delete" data-id="${a.id}">삭제</button>
+    </div>
+  `;
+
+  el.querySelectorAll('input[type=checkbox]').forEach((cb) => {
+    cb.addEventListener("change", () => toggleChecklistItem(a.id, cb.dataset.item, cb.checked));
+  });
+  el.querySelector('[data-action="ai"]').addEventListener("click", () => runAssistant(a.id, ""));
+  const doneBtn = el.querySelector('[data-action="done"]');
+  if (doneBtn) doneBtn.addEventListener("click", () => setStatus(a.id, "done"));
+  const undoneBtn = el.querySelector('[data-action="undone"]');
+  if (undoneBtn) undoneBtn.addEventListener("click", () => setStatus(a.id, "active"));
+  el.querySelector('[data-action="delete"]').addEventListener("click", () => {
+    if (confirm("이 수행평가를 삭제할까요? 관련 기록은 남아있어요.")) {
+      Store.deleteAssessment(a.id);
+      renderBoard();
+    }
+  });
+  return el;
+}
+
+function badgeClass(d, status) {
+  if (status === "done") return "past";
+  if (typeof d !== "number") return "normal";
+  if (d < 0) return "past";
+  if (d <= 2) return "soon";
+  return "normal";
+}
+function ddayLabel(d, status) {
+  if (status === "done") return "완료";
+  if (typeof d !== "number") return "날짜 미정";
+  if (d === 0) return "D-DAY";
+  if (d < 0) return `${-d}일 지남`;
+  return `D-${d}`;
+}
+
+function toggleChecklistItem(assessmentId, itemId, checked) {
+  const a = Store.getAssessment(assessmentId);
+  if (!a) return;
+  const item = a.checklist.find((c) => c.id === itemId);
+  if (item) item.done = checked;
+  Store.saveAssessment(a);
+  renderBoard();
+}
+function setStatus(assessmentId, status) {
+  const a = Store.getAssessment(assessmentId);
+  if (!a) return;
+  a.status = status;
+  Store.saveAssessment(a);
+  renderBoard();
+}
+
+async function runAssistant(assessmentId, extraSourceText) {
+  const a = Store.getAssessment(assessmentId);
+  if (!a) return;
+
+  if (!Store.getSettings().apiKey) {
+    showToast("먼저 ⚙ API 설정에서 Gemini API 키를 입력해 주세요.");
+    document.getElementById("settings-modal").hidden = false;
+    return;
+  }
+
+  openAiModal(`✨ ${a.title} 준비 도우미`, `<p class="loading-line">AI가 내용을 분석하고 있어요...</p>`);
+
+  try {
+    const result = await AI.prepareAssessment(a, extraSourceText);
+
+    const prevDone = new Map(a.checklist.map((c) => [c.label, c.done]));
+    a.checklist = (result.schedule || []).map((s) => ({
+      id: Store.uid(),
+      label: s.label || "단계",
+      detail: s.detail || "",
+      done: prevDone.get(s.label) || false,
+    }));
+    Store.saveAssessment(a);
+    renderBoard();
+
+    Store.addHistory({
+      id: Store.uid(),
+      assessmentId: a.id,
+      assessmentTitle: a.title,
+      subject: a.subject,
+      type: a.type,
+      outline: result.outline || "",
+      feedback: result.feedback || "",
+      schedule: result.schedule || [],
+      createdAt: new Date().toISOString(),
+    });
+    renderArchive();
+    renderAiResult(a, result);
+  } catch (e) {
+    console.error(e);
+    let msg = "AI 분석 중 오류가 발생했어요.";
+    if (String(e.message).includes("NO_API_KEY")) msg = "API 키가 필요해요. ⚙ API 설정에서 입력해 주세요.";
+    else if (String(e.message).includes("API_ERROR")) msg = "Gemini API 호출에 실패했어요: " + e.message;
+    document.getElementById("ai-modal-body").innerHTML = `<p class="loading-line">${escapeHtml(msg)}</p>`;
+  }
+}
+
+function renderAiResult(assessment, result) {
+  const body = document.getElementById("ai-modal-body");
+  const outlineHtml = mdLiteToHtml(result.outline || "");
+  const scheduleHtml = (result.schedule || [])
+    .map((s) => `<li><strong>${escapeHtml(s.label)}</strong> — ${escapeHtml(s.detail || "")}</li>`)
+    .join("");
+  body.innerHTML = `
+    <h4>구조 / 아웃라인</h4>
+    ${outlineHtml}
+    <h4>준비 일정</h4>
+    <ol>${scheduleHtml}</ol>
+    <h4>${AI.TYPE_LABEL[assessment.type]} 피드백</h4>
+    <p>${escapeHtml(result.feedback || "")}</p>
+  `;
+}
+
+function mdLiteToHtml(md) {
+  const lines = md.split("\n");
+  let html = "";
+  let inList = false;
+  lines.forEach((line) => {
+    const t = line.trim();
+    if (t.startsWith("## ")) {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<h4>${escapeHtml(t.slice(3))}</h4>`;
+    } else if (t.startsWith("- ")) {
+      if (!inList) { html += "<ul>"; inList = true; }
+      html += `<li>${escapeHtml(t.slice(2))}</li>`;
+    } else if (t === "") {
+      if (inList) { html += "</ul>"; inList = false; }
+    } else {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<p>${escapeHtml(t)}</p>`;
+    }
+  });
+  if (inList) html += "</ul>";
+  return html;
+}
+
+function renderArchive() {
+  const all = Store.getHistory();
+  const list = document.getElementById("archive-list");
+  const empty = document.getElementById("archive-empty");
+  list.innerHTML = "";
+  empty.hidden = all.length > 0;
+
+  all.forEach((h) => {
+    const el = document.createElement("div");
+    el.className = "archive-item";
+    const date = new Date(h.createdAt).toLocaleString("ko-KR", { dateStyle: "medium", timeStyle: "short" });
+    el.innerHTML = `
+      <div class="archive-item-head">
+        <span>${h.subject ? escapeHtml(h.subject) + " · " : ""}${AI.TYPE_LABEL[h.type] || "기타"}</span>
+        <span>${date}</span>
+      </div>
+      <h3>${escapeHtml(h.assessmentTitle || "제목 없음")}</h3>
+    `;
+    el.addEventListener("click", () => {
+      openAiModal(`📁 ${h.assessmentTitle}`, "");
+      renderAiResult({ type: h.type }, h);
+    });
+    list.appendChild(el);
+  });
+}
+
+function bindModals() {
+  document.getElementById("ai-modal-close").addEventListener("click", () => {
+    document.getElementById("ai-modal").hidden = true;
+  });
+}
+function openAiModal(title, bodyHtml) {
+  document.getElementById("ai-modal-title").textContent = title;
+  document.getElementById("ai-modal-body").innerHTML = bodyHtml;
+  document.getElementById("ai-modal").hidden = false;
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => (t.hidden = true), 3200);
+}
+
+function escapeHtml(str) {
+  return String(str || "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+</script>
 </body>
 </html>
