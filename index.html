@@ -13,7 +13,7 @@
 <body class="p-4 md:p-8 max-w-7xl mx-auto text-slate-800">
 
   <!-- 상단 헤더 -->
-  <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b pb-4">
+  <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b pb-4">
     <div>
       <div class="flex items-center gap-2 text-indigo-600 font-semibold text-sm">
         <i class="fa-solid fa-sparkles"></i> Gemini AI
@@ -58,7 +58,7 @@
               <div id="uploadPrompt" class="space-y-1 pointer-events-none">
                 <i class="fa-solid fa-cloud-arrow-up text-indigo-500 text-xl"></i>
                 <p class="text-xs text-slate-600 font-medium">클릭하거나 파일을 여기에 드래그하세요</p>
-                <p class="text-[10px] text-slate-400">PDF, PNG, JPG (권장 10MB 이하)</p>
+                <p class="text-[10px] text-slate-400">PDF, PNG, JPG (최대 10MB)</p>
               </div>
               <div id="fileInfo" class="hidden flex items-center justify-between bg-indigo-50 p-2 rounded-lg text-xs text-indigo-700 font-medium">
                 <span id="fileName" class="truncate max-w-[200px]">파일명.pdf</span>
@@ -72,9 +72,9 @@
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">수행평가 유형</label>
             <select id="typeSelect" class="w-full p-2.5 text-xs border rounded-lg bg-slate-50 border-slate-200 focus:outline-indigo-500">
+              <option value="실험">🔬 실험/탐구보고서</option>
               <option value="글쓰기">✍️ 글쓰기/서술형/서평</option>
               <option value="발표">🎤 발표/PT/구두발표</option>
-              <option value="실험">🔬 실험/탐구보고서</option>
               <option value="기타">📂 기타 일반 수행평가</option>
             </select>
           </div>
@@ -82,7 +82,7 @@
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">과목명</label>
-              <input type="text" id="subjectInput" placeholder="예: 통합과학" required class="w-full p-2.5 text-xs border rounded-lg bg-slate-50 border-slate-200 focus:outline-indigo-500">
+              <input type="text" id="subjectInput" placeholder="예: 과학탐구실험" required class="w-full p-2.5 text-xs border rounded-lg bg-slate-50 border-slate-200 focus:outline-indigo-500">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">마감 일자 (D-Day)</label>
@@ -200,29 +200,11 @@
       alert('API Key가 저장되었습니다.');
     }
 
-    // 파일 선택 및 드래그 앤 드롭 이벤트를 브라우저에 등록
-    const dropZone = document.getElementById('dropZone');
-
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      dropZone.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }, false);
-    });
-
-    dropZone.addEventListener('drop', (e) => {
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        document.getElementById('fileInput').files = files;
-        handleFileSelect({ target: { files: files } });
-      }
-    }, false);
-
     function handleFileSelect(e) {
       const file = e.target.files[0];
       if (file) {
-        if (file.size > 15 * 1024 * 1024) {
-          alert('파일 용량이 15MB를 초과합니다. 더 작은 파일이나 이미지를 사용해 주세요.');
+        if (file.size > 10 * 1024 * 1024) {
+          alert('파일 용량이 10MB를 초과합니다. 10MB 이하 파일로 선택해주세요.');
           clearFile();
           return;
         }
@@ -239,7 +221,7 @@
       document.getElementById('fileInfo').classList.add('hidden');
     }
 
-    // 파일 Base64 변환 함수
+    // 아이패드 Safari PDF MIME 타입 강제 변환 보정
     function fileToBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -247,14 +229,24 @@
         reader.onload = () => {
           const base64String = reader.result.split(',')[1];
           let mimeType = file.type;
-          if (!mimeType && file.name.endsWith('.pdf')) mimeType = 'application/pdf';
-          resolve({ mimeType: mimeType || 'application/pdf', data: base64String });
+          
+          // 아이패드/iOS Safari에서 PDF 타입이 제대로 안 잡히는 현상 보정
+          const fileNameLower = file.name.toLowerCase();
+          if (fileNameLower.endsWith('.pdf')) {
+            mimeType = 'application/pdf';
+          } else if (fileNameLower.endsWith('.png')) {
+            mimeType = 'image/png';
+          } else if (fileNameLower.endsWith('.jpg') || fileNameLower.endsWith('.jpeg')) {
+            mimeType = 'image/jpeg';
+          }
+
+          if (!mimeType) mimeType = 'application/pdf';
+          resolve({ mimeType: mimeType, data: base64String });
         };
         reader.onerror = error => reject(error);
       });
     }
 
-    // 푸시 알림
     function requestNotificationPermission() {
       if ('Notification' in window) {
         Notification.requestPermission().then(permission => {
@@ -290,12 +282,11 @@
       localStorage.setItem('assessments', JSON.stringify(assessments));
     }
 
-    // AI 분석 함수
     async function handleAnalyze(e) {
       e.preventDefault();
       const apiKey = getApiKey();
       if (!apiKey) {
-        alert('먼저 상단의 [API 키 설정]에서 Gemini API Key를 등록해주세요.');
+        alert('상단의 [API 키 설정] 버튼을 눌러 Gemini API Key를 저장해주세요.');
         openApiKeyModal();
         return;
       }
@@ -308,19 +299,24 @@
       const file = fileInput.files[0];
 
       if (!content && !file) {
-        alert('수행평가 내용이나 유인물 파일 중 하나는 반드시 첨부해주세요.');
+        alert('수행평가 내용이나 유인물 파일 중 하나는 반드시 첨부해야 합니다.');
         return;
       }
 
       const submitBtn = document.getElementById('submitBtn');
       const btnText = document.getElementById('btnText');
       submitBtn.disabled = true;
-      btnText.innerText = 'PDF/파일 분석 중... 잠시만 기다려주세요';
+      btnText.innerText = 'AI가 유인물 및 일정을 분석 중입니다...';
 
       let promptInstruction = '';
-      if (type === '글쓰기') {
+      if (type === '실험') {
+        promptInstruction = `작성 유형: [실험/탐구보고서]
+1. 보고서 목차 (동기-가설-실험과정-결과-결론)
+2. 데이터 정리 및 오차 분석 주의점
+3. 필수 작성 요구사항 체크리스트`;
+      } else if (type === '글쓰기') {
         promptInstruction = `작성 유형: [글쓰기/서술형/서평]
-1. 첨부된 파일/요청사항 기준 개요 및 서론-본론-결론 아웃라인
+1. 개요 및 서론-본론-결론 아웃라인
 2. 필수 포함 키워드 및 표현
 3. 일자별 작성 및 검토 가이드`;
       } else if (type === '발표') {
@@ -328,11 +324,6 @@
 1. 발표 슬라이드/구조 아웃라인 (도입-본론-결론)
 2. 발표 대본 가이드 및 스피치 포인트
 3. 시간 배분 및 예상 Q&A 준비법`;
-      } else if (type === '실험') {
-        promptInstruction = `작성 유형: [실험/탐구보고서]
-1. 보고서 목차 (동기-가설-실험과정-결과-결론)
-2. 데이터 정리 및 오차 분석 주의점
-3. 필수 작성 요구사항 체크리스트`;
       } else {
         promptInstruction = `작성 유형: [일반 수행평가]
 1. 분석 결과 요약 및 성공 제출 전략
@@ -347,7 +338,7 @@
 
 ${promptInstruction}
 
-첨부된 유인물(PDF/이미지) 내용이 있다면 정밀 분석하여 작성 요구 조건, 감점 항목을 명확히 반영하세요.`;
+첨부된 유인물 문서/이미지가 있다면 정밀하게 읽고 조건, 감점 요소를 파악해 답변을 구성하세요.`;
 
       try {
         const parts = [{ text: promptText }];
@@ -362,14 +353,15 @@ ${promptInstruction}
           });
         }
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        // Gemini 1.5 Flash 모델 엔드포인트 호출
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: [{ parts }] })
         });
 
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error?.message || 'AI 분석 실패');
+        if (!response.ok) throw new Error(data.error?.message || 'API 호출 오류가 발생했습니다.');
 
         const aiFeedback = data.candidates[0].content.parts[0].text;
 
@@ -378,7 +370,7 @@ ${promptInstruction}
           type,
           subject,
           dueDate,
-          content: content || (file ? `[파일 첨부됨] ${file.name}` : '내용 없음'),
+          content: content || (file ? `[파일 첨부] ${file.name}` : '내용 없음'),
           fileName: file ? file.name : null,
           aiFeedback,
           completed: false,
@@ -391,16 +383,15 @@ ${promptInstruction}
 
         document.getElementById('assessmentForm').reset();
         clearFile();
-        alert('PDF/유인물 분석 및 수행평가 등록이 완료되었습니다!');
+        alert('분석이 완료되어 등록되었습니다!');
       } catch (err) {
-        alert('오류가 발생했습니다: ' + err.message);
+        alert('오류 발생: ' + err.message + '\n(API 키가 올바른지 확인해주세요)');
       } finally {
         submitBtn.disabled = false;
         btnText.innerText = 'AI 분석 & 일정 등록하기';
       }
     }
 
-    // UI 목록 렌더링
     function renderList() {
       const container = document.getElementById('listContainer');
       container.innerHTML = '';
