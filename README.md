@@ -4,18 +4,6 @@
 그 기록을 기기에 저장해서 언제든 다시 볼 수 있는 순수 HTML/CSS/JS 웹앱입니다.
 서버 없이 GitHub Pages 등 정적 호스팅에 그대로 올릴 수 있어요.
 
-## 폴더 구조
-```
-index.html
-manifest.json
-sw.js                # 서비스 워커 (알림 + 기본 오프라인 캐시)
-css/style.css
-js/store.js          # localStorage 데이터 저장/조회
-js/ai.js             # 유형별 프롬프트 생성 + Gemini API 호출 + PDF 텍스트 추출
-js/notifications.js  # 알림 권한 요청, D-2 체크
-js/app.js            # 화면 렌더링, 이벤트 연결
-```
-
 ## 기능
 1. **일정 등록 + D-2 알림** — 과목/제목/유형/마감일을 입력하면 목록에 D-day와 함께 표시됩니다.
    브라우저 알림 권한을 켜두면, 마감 2일 전에 알림이 뜹니다.
@@ -35,24 +23,7 @@ js/app.js            # 화면 렌더링, 이벤트 연결
 2. 저장소 **Settings → Pages**에서 배포 브랜치를 지정합니다 (예: `main`, 루트 폴더).
 3. 몇 분 후 `https://아이디.github.io/저장소이름/`에서 접속할 수 있습니다.
 4. 아이폰/아이패드에서는 Safari로 접속 후 "공유 → 홈 화면에 추가"를 하면
-   앱처럼 아이콘이 생깁니다 (스크린샷의 "아이패드 홈 추가"와 동일한 효과).
-
-## Gemini API 키 설정 (무료)
-- [aistudio.google.com/apikey](https://aistudio.google.com/apikey)에 구글 계정으로 로그인해서
-  "Create API key"를 누르면 카드 등록 없이 바로 키가 발급됩니다.
-- 앱 오른쪽 위 **⚙ API 설정**에 그 키를 붙여넣으세요. 키는 이 브라우저의 localStorage에만
-  저장되고, 요청은 브라우저에서 Google의 Gemini API 서버로 직접 전송됩니다.
-- 기본 모델은 `js/ai.js`의 `GEMINI_MODEL`에 지정된 무료 등급 모델(`gemini-3.1-flash-lite`)입니다.
-  Google이 모델명을 바꾸거나 새 모델을 내놓으면 이 값만 바꿔주면 됩니다 — 최신 모델 목록은
-  [ai.google.dev/gemini-api/docs/models](https://ai.google.dev/gemini-api/docs/models)에서 확인하세요.
-- **무료 등급 주의사항**: 분당/일일 요청 수 제한이 있고, 무료 등급으로 보낸 프롬프트와 응답은
-  구글이 서비스 개선(모델 학습 등)에 활용할 수 있다고 명시되어 있습니다. 민감한 개인정보가
-  아닌 학교 과제 안내문 정도라면 크게 문제될 내용은 아니지만 참고해두세요.
-- **주의**: 이 방식은 나만 쓰는 기기/브라우저에서 개인적으로 쓰기 위한 것입니다. 이 사이트를
-  다른 사람도 접속할 수 있게 공개 배포하면서 자신의 키를 미리 넣어두면 안 됩니다(키가 노출돼요).
-  여러 사람이 쓰게 하려면 키를 서버(Vercel/Cloudflare Workers 등)에 두고 그 서버를 통해
-  호출하는 구조로 바꿔야 합니다.
-
+   앱처럼 아이콘이 생깁니다 (스크린샷의 "아이패드 홈 추가"와 동일한 효과) 
 ## 알림에 대한 중요한 한계
 브라우저의 `Notification` API와 서비스 워커만으로는, **브라우저/탭을 완전히 종료한 상태에서도
 울리는 진짜 푸시 알림**은 만들 수 없습니다 (이건 서버가 있어야 가능해요, 예: Firebase Cloud
@@ -64,8 +35,3 @@ Messaging + 백엔드). 이 앱은:
 같이 추가해두는 것을 추천해요. 원한다면 이후에 백엔드(예: Cloudflare Workers + Web Push)를
 붙여서 진짜 백그라운드 푸시로 확장할 수 있도록 코드가 모듈화되어 있습니다
 (`js/notifications.js`만 교체하면 됩니다).
-
-## 커스터마이징 팁
-- 다른 AI 제공자(Claude, OpenAI 등)를 쓰고 싶다면 `js/ai.js`의 `callGemini` 함수만 바꾸면 됩니다.
-- 유형별 프롬프트를 더 세분화하고 싶다면 `TYPE_INSTRUCTIONS` 객체에 항목을 추가하세요.
-- 색/폰트는 `css/style.css` 맨 위 `:root` 변수에서 한 번에 바꿀 수 있습니다.
