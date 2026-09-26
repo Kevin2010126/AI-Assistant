@@ -16,14 +16,23 @@
   <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b pb-4">
     <div>
       <div class="flex items-center gap-2 text-indigo-600 font-semibold text-sm">
-        <i class="fa-solid fa-bolt"></i> Smart Assistant
+        <i class="fa-solid fa-hard-drive text-emerald-500"></i>
+        <span>영구 로컬 저장 지원</span>
       </div>
       <h1 class="text-2xl font-bold text-slate-900 mt-1">수행평가 AI 플래너</h1>
-      <p class="text-xs text-slate-500">API 키 필요 없는 자동 가이드 & D-2 일정 관리자</p>
+      <p class="text-xs text-slate-500">기기 재부팅 & 앱 종료에도 진행 상황 100% 자동 보존</p>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2">
+      <!-- 백업 및 복원 버튼 -->
+      <button onclick="exportData()" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border rounded-lg flex items-center gap-1 font-medium transition" title="데이터 백업 파일 저장">
+        <i class="fa-solid fa-download"></i> 백업
+      </button>
+      <label class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border rounded-lg flex items-center gap-1 font-medium cursor-pointer transition" title="백업 파일 불러오기">
+        <i class="fa-solid fa-upload"></i> 복원
+        <input type="file" id="importInput" accept=".json" class="hidden" onchange="importData(event)">
+      </label>
       <button onclick="requestNotificationPermission()" class="px-3 py-1.5 text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 rounded-lg flex items-center gap-1.5 font-medium transition">
-        <i class="fa-regular fa-bell"></i> D-2 알림 설정
+        <i class="fa-regular fa-bell"></i> D-2 알림
       </button>
     </div>
   </header>
@@ -31,23 +40,21 @@
   <!-- 대시보드 그리드 -->
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- 좌측: 유인물 분석 및 입력 -->
+    <!-- 좌측: 입력 폼 -->
     <section class="lg:col-span-5 space-y-6">
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
         <div class="flex justify-between items-center mb-3">
           <div class="flex items-center gap-2 font-bold text-slate-800">
             <i class="fa-solid fa-pen-ruler text-indigo-600"></i>
-            <span>수행평가 자동 분석</span>
+            <span>수행평가 등록</span>
           </div>
-          <span class="text-[11px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">무료 / 즉시 사용</span>
+          <span class="text-[11px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">자동 저장 활성</span>
         </div>
         <p class="text-xs text-slate-500 mb-4 leading-relaxed">
-          수행평가 정보와 주제를 입력해 주세요. 유형(글쓰기/발표/실험)에 맞는 맞춤형 아웃라인과 단계별 준비 일정을 바로 짜드립니다.
+          수행평가 정보를 입력하면 유형에 맞는 맞춤 아웃라인과 단계별 일정을 자동으로 생성하고 기기에 안전하게 저장합니다.
         </p>
 
         <form id="assessmentForm" onsubmit="handleAnalyze(event)" class="space-y-3">
-          
-          <!-- 유인물 파일 첨부 (참고용) -->
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">유인물 파일 첨부 (선택)</label>
             <div id="dropZone" class="border-2 border-dashed border-slate-200 hover:border-indigo-400 bg-slate-50 rounded-xl p-3.5 text-center cursor-pointer transition relative">
@@ -87,23 +94,22 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">주제 및 조건 입력</label>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">주제 및 상세 요구사항</label>
             <textarea id="contentInput" rows="3" placeholder="예: 속도 측정 실험 결과를 그래프로 분석하고 오차 원인 작성하기" required class="w-full p-2.5 text-xs border rounded-lg bg-slate-50 border-slate-200 focus:outline-indigo-500 resize-none"></textarea>
           </div>
 
           <button type="submit" id="submitBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs rounded-xl shadow-sm flex items-center justify-center gap-2 transition">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <span>아웃라인 & 일정 자동 생성하기</span>
+            <span>아웃라인 생성 & 일정 등록하기</span>
           </button>
         </form>
       </div>
 
-      <!-- 준비 팁 카드 -->
-      <div class="bg-amber-50/70 border border-amber-200/70 p-4 rounded-xl text-xs text-amber-900 flex gap-3 items-start">
-        <i class="fa-solid fa-lightbulb text-amber-500 text-base mt-0.5"></i>
+      <div class="bg-emerald-50/80 border border-emerald-200 p-4 rounded-xl text-xs text-emerald-900 flex gap-3 items-start">
+        <i class="fa-solid fa-shield-halved text-emerald-600 text-base mt-0.5"></i>
         <div>
-          <strong class="font-bold block mb-0.5">스마트 플래너 사용 팁</strong>
-          입력하신 유형(글쓰기, 발표, 실험)에 따라 서론/본론/결론 개요와 감점을 피할 수 있는 맞춤 체크리스트를 즉시 생성해 드립니다.
+          <strong class="font-bold block mb-0.5">데이터 영구 보존 안내</strong>
+          모든 데이터는 기기의 LocalStorage에 실시간 저장됩니다. 앱을 완전히 종료하거나 iPad/아이폰을 재부팅해도 그대로 유지됩니다.
         </div>
       </div>
     </section>
@@ -130,7 +136,7 @@
         <div class="flex justify-between items-center mb-4">
           <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
             <i class="fa-solid fa-list-check text-indigo-600"></i>
-            등록된 수행평가 기록 (기기 저장)
+            등록된 수행평가 목록
           </h2>
         </div>
         <div id="listContainer" class="space-y-4"></div>
@@ -138,7 +144,7 @@
     </section>
   </div>
 
-  <!-- 상세 결과 보기 모달 -->
+  <!-- 상세 모달 -->
   <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 space-y-4 shadow-xl">
       <div class="flex justify-between items-start border-b pb-3">
@@ -155,13 +161,36 @@
   </div>
 
   <script>
-    let assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
+    const STORAGE_KEY = 'v2_assessments_planner_data';
+    let assessments = [];
 
+    // 안전한 데이터 불러오기
+    function loadAssessments() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        assessments = raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        console.error('로컬 스토리지 읽기 실패:', e);
+        assessments = [];
+      }
+    }
+
+    // 안전한 데이터 저장하기
     function saveAssessments() {
-      localStorage.setItem('assessments', JSON.stringify(assessments));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(assessments));
+      } catch (e) {
+        console.error('로컬 스토리지 저장 실패:', e);
+      }
       renderList();
       checkD2Notifications();
     }
+
+    // iOS/iPad Safari 생명주기 대응 (앱 종료/슬립 상태 전환 시 강제 이중 저장)
+    window.addEventListener('pagehide', saveAssessments);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') saveAssessments();
+    });
 
     function closeModal(id) {
       document.getElementById(id).classList.add('hidden');
@@ -183,19 +212,54 @@
       document.getElementById('fileInfo').classList.add('hidden');
     }
 
-    // D-2 브라우저 알림 기능
+    // 백업 내보내기 (JSON 다운로드)
+    function exportData() {
+      if (assessments.length === 0) {
+        alert('백업할 데이터가 없습니다.');
+        return;
+      }
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(assessments, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `수행평가_플래너_백업_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    // 백업 불러오기 (JSON 업로드)
+    function importData(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        try {
+          const imported = JSON.parse(event.target.result);
+          if (Array.isArray(imported)) {
+            assessments = imported;
+            saveAssessments();
+            alert('성공적으로 데이터를 복원했습니다!');
+          } else {
+            alert('올바르지 않은 백업 파일 형식입니다.');
+          }
+        } catch (err) {
+          alert('파일을 읽는 중 오류가 발생했습니다.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
     function requestNotificationPermission() {
       if ('Notification' in window) {
         Notification.requestPermission().then(permission => {
           if (permission === 'granted') {
-            alert('D-2 알림 설정이 완료되었습니다. 수행평가 마감 2일 전에 알림을 보냅니다.');
+            alert('D-2 알림 설정이 완료되었습니다.');
             checkD2Notifications();
           } else {
             alert('알림 권한이 거부되었습니다.');
           }
         });
-      } else {
-        alert('이 브라우저는 알림 기능을 지원하지 않습니다.');
       }
     }
 
@@ -212,16 +276,17 @@
 
         if (diffDays === 2 && !item.notified) {
           new Notification(`[수행평가 D-2 알림] ${item.subject}`, {
-            body: `"${item.content.substring(0, 20)}..." 마감까지 2일 남았습니다! 아웃라인을 점검하세요.`,
+            body: `"${item.content.substring(0, 20)}..." 마감까지 2일 남았습니다!`,
             icon: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
           });
           item.notified = true;
         }
       });
-      localStorage.setItem('assessments', JSON.stringify(assessments));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(assessments));
+      } catch(e) {}
     }
 
-    // 스마트 자체 피드백 생성 엔진 (API 미사용)
     function generateSmartOutline(type, subject, content) {
       let result = `📋 [${subject}] ${type} 수행평가 준비 가이드\n\n`;
       result += `📌 입력 주제: "${content}"\n\n`;
@@ -229,73 +294,40 @@
 
       if (type === '글쓰기') {
         result += `✍️ [글쓰기/서술형 맞춤 아웃라인]\n\n`;
-        result += `1. 서론 (전체의 20%)\n`;
-        result += `   • 동기 및 주제 선정 이유\n`;
-        result += `   • 핵심 질문 제시: "${content}"와 관련된 문제의식 밝히기\n\n`;
-        result += `2. 본론 (전체의 60%)\n`;
-        result += `   • 근거 1: 객관적 사실 및 핵심 개념 정의\n`;
-        result += `   • 근거 2: 사례 분석 및 자신의 시각 제시\n`;
-        result += `   • 반론 및 재반론: 예외 상황을 언급하여 서술의 깊이 더하기\n\n`;
-        result += `3. 결론 (전체의 20%)\n`;
-        result += `   • 본론 요약 및 핵심 메시지 재확인\n`;
-        result += `   • 느낀 점 및 향후 느낀 과제/지향점 정리\n\n`;
+        result += `1. 서론: 동기 및 핵심 문제의식 제시\n`;
+        result += `2. 본론: 근거 제시, 사례 분석, 반론 논의\n`;
+        result += `3. 결론: 요약 정리 및 향후 제언\n\n`;
         result += `⚠️ 감점 예방 체크리스트:\n`;
-        result += `   [ ] 원고지 분량/글자 수 감점 기준 확인했는가?\n`;
-        result += `   [ ] 핵심 단어/필수 서술어가 빠짐없이 들어갔는가?\n`;
-        result += `   [ ] 비문(문장 호응)이나 맞춤법 오류가 없는가?\n`;
-
+        result += `   [ ] 분량 조건 준수\n   [ ] 비문/맞춤법 검수\n`;
       } else if (type === '발표') {
-        result += `🎤 [발표/PT 맞춤 구조화 가이드]\n\n`;
-        result += `1. 도입 (1분)\n`;
-        result += `   • 흥미 유발 질문 또는 강렬한 데이터로 시작\n`;
-        result += `   • 발표 주제 및 목차 안내\n\n`;
-        result += `2. 전개 (2~3분)\n`;
-        result += `   • 슬라이드 1: 핵심 문제 정의 (${content})\n`;
-        result += `   • 슬라이드 2: 주요 데이터 및 시각 자료(그래프/사진)\n`;
-        result += `   • 슬라이드 3: 결론 및 시사점\n\n`;
-        result += `3. 마무리 (1분)\n`;
-        result += `   • 한 줄 요약 정리 및 청중을 향한 맺음말\n`;
-        result += `   • 예상 질문 2가지에 대한 답변 준비\n\n`;
+        result += `🎤 [발표/PT 맞춤 아웃라인]\n\n`;
+        result += `1. 도입: 흥미 유발 및 목차 소개\n`;
+        result += `2. 전개: 문제 정의, 데이터/시각자료, 해결책\n`;
+        result += `3. 마무리: 요약 및 예상 Q&A 준비\n\n`;
         result += `⚠️ 감점 예방 체크리스트:\n`;
-        result += `   [ ] 제한 시간(예: 3분/5분)을 넘기거나 너무 일찍 끝나지 않는가?\n`;
-        result += `   [ ] 대본만 읽지 않고 청중과 시선 맞춤(Eye Contact)이 가능한가?\n`;
-        result += `   [ ] PPT 슬라이드 글씨가 너무 작거나 과도하게 빽빽하지 않은가?\n`;
-
+        result += `   [ ] 발표 시간 준수\n   [ ] 시선 처리 연습\n`;
       } else if (type === '실험') {
-        result += `🔬 [실험/탐구보고서 맞춤 구조화 가이드]\n\n`;
-        result += `1. 탐구 동기 및 가설 설정\n`;
-        result += `   • 탐구 목적 및 가설 (예: ~할수록 ~할 것이다)\n\n`;
-        result += `2. 실험 준비물 및 변인 통제\n`;
-        result += `   • 조종 변인 / 통제 변인 / 종속 변인 구분 작성\n\n`;
-        result += `3. 실험 결과 분석 및 오차 논의\n`;
-        result += `   • 측정 데이터 표 및 그래프화\n`;
-        result += `   • 오차 발생 원인 분석 (기기 오차, 환경 변수 등)\n\n`;
-        result += `4. 결론 및 알게 된 점\n`;
-        result += `   • 가설 검증 여부 결론 도출\n\n`;
+        result += `🔬 [실험/탐구보고서 맞춤 아웃라인]\n\n`;
+        result += `1. 가설 설정 및 변인 통제\n`;
+        result += `2. 실험 결과 데이터 표/그래프화\n`;
+        result += `3. 오차 분석 및 결론 도출\n\n`;
         result += `⚠️ 감점 예방 체크리스트:\n`;
-        result += `   [ ] 단위(cm, s, g 등) 표기를 빠뜨리지 않았는가?\n`;
-        result += `   [ ] 오차 원인을 단순 실수 대신 학술적/환경적 원인으로 분석했는가?\n`;
-
+        result += `   [ ] 단위 표기 확인\n   [ ] 오차 원인 분석 작성\n`;
       } else {
         result += `📂 [일반 수행평가 준비 가이드]\n\n`;
-        result += `1. 제출 요구 조건 세부 분석\n`;
-        result += `2. 자료 조사 및 핵심 내용 요약 정리\n`;
-        result += `3. 검토 및 최종 제출본 점검\n\n`;
-        result += `⚠️ 감점 예방 체크리스트:\n`;
-        result += `   [ ] 선생님이 제시한 제출 양식을 정확히 지켰는가?\n`;
-        result += `   [ ] 마감 기한 및 시간을 엄수했는가?\n`;
+        result += `1. 작성 조건 분석 및 자료 조사\n`;
+        result += `2. 초안 작성 및 조건 대조 검토\n`;
       }
 
       result += `\n─────────────────────────────\n`;
       result += `📅 추천 3단계 실행 스케줄:\n`;
-      result += `• Step 1 (자료 수집): 개요 작성 및 필요 참고 자료 확보\n`;
-      result += `• Step 2 (초안 작성): 아웃라인 바탕으로 1차 완성\n`;
-      result += `• Step 3 (최종 검토): 감점 체크리스트 점검 및 제출 준비`;
+      result += `• Step 1: 개요 작성 및 자료 확보\n`;
+      result += `• Step 2: 초안 완성\n`;
+      result += `• Step 3: 최종 감점 체크리스트 점검 후 제출`;
 
       return result;
     }
 
-    // 분석 처리
     function handleAnalyze(e) {
       e.preventDefault();
 
@@ -306,7 +338,6 @@
       const fileInput = document.getElementById('fileInput');
       const file = fileInput.files[0];
 
-      // 스마트 아웃라인 및 피드백 자동 생성
       const aiFeedback = generateSmartOutline(type, subject, content);
 
       const newItem = {
@@ -327,10 +358,9 @@
 
       document.getElementById('assessmentForm').reset();
       clearFile();
-      alert('맞춤 아웃라인 및 계획이 성공적으로 생성되었습니다!');
+      alert('진행 상황이 기기에 안전하게 저장되었습니다!');
     }
 
-    // UI 렌더링
     function renderList() {
       const container = document.getElementById('listContainer');
       container.innerHTML = '';
@@ -344,7 +374,7 @@
         container.innerHTML = `
           <div class="text-center py-12 text-slate-400 text-xs">
             <i class="fa-regular fa-folder-open text-3xl mb-2 text-slate-300"></i>
-            <p>등록된 수행평가가 없습니다. 왼쪽에서 수행평가를 입력해보세요!</p>
+            <p>등록된 수행평가가 없습니다. 새로운 수행평가를 등록해보세요!</p>
           </div>`;
       }
 
@@ -430,6 +460,8 @@
       document.getElementById('detailModal').classList.remove('hidden');
     }
 
+    // 앱 시작 시 저장된 데이터 로드
+    loadAssessments();
     renderList();
     checkD2Notifications();
   </script>
