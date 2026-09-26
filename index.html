@@ -1,901 +1,437 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>수행평가 작업실</title>
-<meta name="theme-color" content="#16211A" />
-<link rel="preconnect" href="https://cdn.jsdelivr.net" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&display=swap" />
-<style>
-:root{
-  --ink:#16211A;
-  --ink-soft:#3C463E;
-  --paper:#F5F6F0;
-  --paper-raised:#FFFFFF;
-  --line:#DEDCCF;
-  --amber:#C97A2B;
-  --amber-soft:#F2E1CC;
-  --teal:#2F6F5E;
-  --teal-soft:#DCEAE4;
-  --danger:#B5482A;
-  --radius:10px;
-  --serif:"Noto Serif KR", serif;
-  --sans:"Pretendard", -apple-system, "Apple SD Gothic Neo", sans-serif;
-}
-
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;}
-body{
-  background:var(--paper);
-  color:var(--ink);
-  font-family:var(--sans);
-  line-height:1.5;
-  padding-bottom:60px;
-}
-
-h1,h2{font-family:var(--serif); margin:0; font-weight:700;}
-h2{font-size:1.15rem; margin-bottom:14px; letter-spacing:-0.01em;}
-
-.topbar{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:22px 28px 18px;
-  border-bottom:1px solid var(--line);
-}
-.brand{display:flex; align-items:center; gap:14px;}
-.brand-mark{
-  font-family:var(--serif); font-size:1.6rem;
-  width:44px; height:44px; border-radius:50%;
-  background:var(--ink); color:var(--paper);
-  display:flex; align-items:center; justify-content:center;
-}
-.brand h1{font-size:1.35rem;}
-.tagline{margin:2px 0 0; font-size:0.85rem; color:var(--ink-soft);}
-.topbar-actions{display:flex; gap:8px;}
-
-.ghost-btn{
-  background:transparent; border:1px solid var(--line); border-radius:999px;
-  padding:8px 14px; font-size:0.85rem; cursor:pointer; color:var(--ink);
-  font-family:var(--sans);
-}
-.ghost-btn:hover{border-color:var(--ink);}
-
-.tabs{
-  display:flex; gap:4px; padding:14px 28px 0; border-bottom:1px solid var(--line);
-}
-.tab-btn{
-  background:none; border:none; padding:10px 4px; margin-right:22px;
-  font-family:var(--sans); font-size:0.95rem; color:var(--ink-soft);
-  border-bottom:2px solid transparent; cursor:pointer;
-}
-.tab-btn.active{ color:var(--ink); border-bottom-color:var(--amber); font-weight:600;}
-
-main{max-width:880px; margin:0 auto; padding:26px 24px 60px;}
-.tab-panel{display:none;}
-.tab-panel.active{display:block;}
-
-.stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px;}
-.stat-card{
-  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
-  padding:16px; display:flex; flex-direction:column; gap:4px;
-}
-.stat-num{font-family:var(--serif); font-size:1.9rem;}
-.stat-label{font-size:0.8rem; color:var(--ink-soft);}
-.stat-card.stat-warn{border-color:var(--amber); background:var(--amber-soft);}
-.stat-card.stat-warn .stat-num{color:var(--amber);}
-.stat-card.stat-done{border-color:var(--teal); background:var(--teal-soft);}
-.stat-card.stat-done .stat-num{color:var(--teal);}
-
-.board-list{display:flex; flex-direction:column; gap:12px;}
-.board-item{
-  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
-  padding:16px 18px;
-}
-.board-item.urgent{border-left:4px solid var(--amber);}
-.board-item.done{opacity:0.62;}
-.board-item-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
-.board-item-title{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
-.chip{
-  font-size:0.72rem; padding:3px 9px; border-radius:999px; background:var(--ink);
-  color:var(--paper); white-space:nowrap;
-}
-.chip.subject{background:var(--ink-soft);}
-.chip.type-writing{background:#5C4A8A;}
-.chip.type-presentation{background:#2F6F5E;}
-.chip.type-experiment{background:#B5482A;}
-.chip.type-etc{background:#6B6B5E;}
-.dday{font-size:0.78rem; font-weight:700; padding:3px 10px; border-radius:999px;}
-.dday.soon{background:var(--amber); color:#fff;}
-.dday.normal{background:var(--line); color:var(--ink-soft);}
-.dday.past{background:#eee; color:#999;}
-.board-item h3{margin:8px 0 4px; font-size:1.02rem; font-family:var(--sans); font-weight:600;}
-.board-item p{margin:0; font-size:0.88rem; color:var(--ink-soft);}
-
-.progress-row{display:flex; align-items:center; gap:10px; margin-top:12px;}
-.progress-bar{flex:1; height:7px; background:var(--line); border-radius:99px; overflow:hidden;}
-.progress-bar > span{display:block; height:100%; background:var(--teal);}
-.progress-pct{font-size:0.78rem; color:var(--ink-soft); width:38px; text-align:right;}
-
-.checklist{margin-top:12px; display:flex; flex-direction:column; gap:6px;}
-.checklist label{
-  display:flex; align-items:flex-start; gap:8px; font-size:0.87rem; cursor:pointer;
-  font-weight:400;
-}
-.checklist input{margin-top:3px;}
-
-.item-actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
-.item-actions button{font-size:0.8rem;}
-
-.form-card{
-  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
-  padding:22px;
-}
-label{display:block; font-size:0.85rem; font-weight:600; margin-bottom:14px; color:var(--ink);}
-input[type=text], input[type=date], input[type=password], select, textarea, input[type=file]{
-  display:block; width:100%; margin-top:6px; padding:10px 12px;
-  border:1px solid var(--line); border-radius:8px; font-family:var(--sans); font-size:0.92rem;
-  background:#fff; color:var(--ink);
-}
-textarea{resize:vertical;}
-.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
-.file-status{font-size:0.8rem; color:var(--teal); min-height:1em; margin-top:-8px;}
-
-.primary-btn, .accent-btn{
-  border:none; border-radius:8px; padding:12px 18px; font-size:0.92rem; font-weight:600;
-  cursor:pointer; font-family:var(--sans); margin-right:10px; margin-top:4px;
-}
-.primary-btn{background:var(--ink); color:var(--paper);}
-.accent-btn{background:var(--amber); color:#fff;}
-.primary-btn:hover{background:var(--ink-soft);}
-.accent-btn:hover{filter:brightness(1.05);}
-.link-btn{background:none; border:none; color:var(--amber); font-weight:600; cursor:pointer; font-family:var(--sans); padding:0;}
-
-.muted{color:var(--ink-soft); font-size:0.87rem;}
-.warn-box{
-  background:var(--amber-soft); border:1px solid var(--amber); border-radius:8px;
-  padding:10px 12px; font-size:0.8rem; color:#7A4715; margin-bottom:14px;
-}
-.empty-hint{color:var(--ink-soft); font-size:0.9rem; text-align:center; padding:30px 0;}
-
-.archive-list{display:flex; flex-direction:column; gap:10px;}
-.archive-item{
-  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
-  padding:14px 16px; cursor:pointer;
-}
-.archive-item:hover{border-color:var(--ink);}
-.archive-item-head{display:flex; justify-content:space-between; font-size:0.85rem; color:var(--ink-soft);}
-.archive-item h3{margin:6px 0 0; font-size:0.98rem; font-family:var(--sans);}
-
-.modal{
-  position:fixed; inset:0; background:rgba(22,33,26,0.45);
-  display:flex; align-items:center; justify-content:center; padding:20px; z-index:50;
-}
-.modal-box{
-  background:var(--paper); border-radius:14px; max-width:640px; width:100%;
-  max-height:86vh; display:flex; flex-direction:column; overflow:hidden;
-  border:1px solid var(--line);
-}
-.modal-box-narrow{max-width:460px;}
-.modal-head{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:18px 20px; border-bottom:1px solid var(--line);
-}
-.modal-body{padding:20px; overflow-y:auto; font-size:0.92rem;}
-.modal-body h4{font-family:var(--serif); margin:16px 0 6px;}
-.modal-body h4:first-child{margin-top:0;}
-.modal-body ul, .modal-body ol{padding-left:20px; margin:6px 0;}
-.modal-body li{margin-bottom:4px;}
-.icon-btn{background:none; border:none; font-size:1.1rem; cursor:pointer; color:var(--ink-soft);}
-.loading-line{color:var(--ink-soft); font-style:italic;}
-
-.toast{
-  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
-  background:var(--ink); color:var(--paper); padding:11px 20px; border-radius:999px;
-  font-size:0.88rem; z-index:80;
-}
-
-@media (max-width:600px){
-  .grid-2{grid-template-columns:1fr;}
-  .stat-row{grid-template-columns:1fr; }
-  .topbar{flex-direction:column; align-items:flex-start; gap:12px;}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>수행평가 AI 플래너</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f8fafc; }
+  </style>
 </head>
-<body>
+<body class="p-4 md:p-8 max-w-7xl mx-auto text-slate-800">
 
-<header class="topbar">
-  <div class="brand">
-    <span class="brand-mark">畵</span>
+  <!-- 상단 헤더 -->
+  <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b pb-4">
     <div>
-      <h1>수행평가 작업실</h1>
-      <p class="tagline">일정을 등록하면, 자료를 읽고, 준비를 나눠서 도와줘요</p>
+      <div class="flex items-center gap-2 text-indigo-600 font-semibold text-sm">
+        <i class="fa-solid fa-sparkles"></i> Gemini
+      </div>
+      <h1 class="text-2xl font-bold text-slate-900 mt-1">수행평가 AI 플래너</h1>
+      <p class="text-xs text-slate-500">고교 수행평가 분석 & D-2 일정 관리자</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="requestNotificationPermission()" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 border rounded-lg flex items-center gap-1.5 font-medium">
+        <i class="fa-regular fa-bell"></i> 알림 설정
+      </button>
+      <button onclick="openApiKeyModal()" class="px-3 py-1.5 text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 rounded-lg flex items-center gap-1.5 font-medium">
+        <i class="fa-solid fa-key"></i> API 키 설정
+      </button>
+    </div>
+  </header>
+
+  <!-- 대시보드 그리드 -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- 좌측: 유인물 AI 분석 및 입력 -->
+    <section class="lg:col-span-5 space-y-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex justify-between items-center mb-3">
+          <div class="flex items-center gap-2 font-bold text-slate-800">
+            <i class="fa-solid fa-file-lines text-indigo-600"></i>
+            <span>수행평가 AI 분석</span>
+          </div>
+          <span class="text-[11px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">자동 가이드 생성</span>
+        </div>
+        <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+          선생님이 나눠주신 안내문 내용이나 주제를 입력해주세요. 제출 마감일, 필수 키워드, 단계별 준비 일정 및 아웃라인을 완벽하게 정리해 드릴게요!
+        </p>
+
+        <form id="assessmentForm" onsubmit="handleAnalyze(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">유형 선택</label>
+            <select id="typeSelect" class="w-full p-2.5 text-xs border rounded-lg bg-slate-50 border-slate-200 focus:outline-indigo-500">
+              <option value="글쓰기">✍️ 글쓰기/서술형/서평</option>
+              <option value="발표">🎤 발표/PT/구두발표</option>
+              <option value="실험">🔬 실험/탐구보고서</option>
+              <option value="기타">📂 기타 일반 수행평가</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">과목명</label>
+              <input type="text" id="subjectInput" placeholder="예: 통합과학" required class="w-full p-2.5 text-xs border rounded-lg bg-slate-50 border-slate-200 focus:outline-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">마감 일자 (D-Day)</label>
+              <input type="date" id="dueDateInput" required class="w-full p-2.5 text-xs border rounded-lg bg-slate-50 border-slate-200 focus:outline-indigo-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">수행평가 주제 및 세부 내용</label>
+            <textarea id="contentInput" rows="4" placeholder="선생님이 제시하신 조건, 주제, 주의사항 등을 상세히 적어주세요." required class="w-full p-2.5 text-xs border rounded-lg bg-slate-50 border-slate-200 focus:outline-indigo-500 resize-none"></textarea>
+          </div>
+
+          <button type="submit" id="submitBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs rounded-xl shadow-sm flex items-center justify-center gap-2 transition">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span id="btnText">AI 분석 & 일정 등록하기</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- 준비 팁 카드 -->
+      <div class="bg-amber-50/60 border border-amber-200/60 p-4 rounded-xl text-xs text-amber-900 flex gap-3 items-start">
+        <i class="fa-solid fa-lightbulb text-amber-500 text-base mt-0.5"></i>
+        <div>
+          <strong class="font-bold block mb-0.5">당일 수행평가 준비 팁</strong>
+          수업시간에 진행하는 단답형/논술형 수행평가는 AI 분석기 기능으로 필수 제출 조건과 핵심 키워드를 미리 정돈해 두시면 감점을 피할 수 있어요!
+        </div>
+      </div>
+    </section>
+
+    <!-- 우측: 요약 스탯 & 수행평가 목록 -->
+    <section class="lg:col-span-7 space-y-6">
+      
+      <!-- 통계 카운터 -->
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-center">
+          <p class="text-[11px] font-medium text-slate-500 mb-1">전체 수행평가</p>
+          <p id="statTotal" class="text-xl font-bold text-slate-800">0개</p>
+        </div>
+        <div class="bg-amber-50/50 p-3.5 rounded-xl border border-amber-200 text-center">
+          <p class="text-[11px] font-medium text-amber-600 mb-1">진행 중 / 임박</p>
+          <p id="statOngoing" class="text-xl font-bold text-amber-600">0개</p>
+        </div>
+        <div class="bg-emerald-50/50 p-3.5 rounded-xl border border-emerald-200 text-center">
+          <p class="text-[11px] font-medium text-emerald-600 mb-1">완료됨</p>
+          <p id="statDone" class="text-xl font-bold text-emerald-600">0개</p>
+        </div>
+      </div>
+
+      <!-- 등록된 수행평가 목록 -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-indigo-600"></i>
+            등록된 수행평가 목록
+          </h2>
+        </div>
+
+        <div id="listContainer" class="space-y-4">
+          <!-- JS로 동적 생성됨 -->
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 상세 결과 보기 모달 -->
+  <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 space-y-4 shadow-xl">
+      <div class="flex justify-between items-start border-b pb-3">
+        <div>
+          <span id="modalSubject" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">과목</span>
+          <h3 id="modalTitle" class="text-lg font-bold text-slate-900 mt-1">수행평가 상세 계획</h3>
+        </div>
+        <button onclick="closeModal('detailModal')" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="modalContent" class="text-xs leading-relaxed text-slate-700 whitespace-pre-line bg-slate-50 p-4 rounded-xl border border-slate-100">
+        <!-- AI 분석 및 아웃라인 피드백이 여기에 출력됨 -->
+      </div>
     </div>
   </div>
-  <div class="topbar-actions">
-    <button id="btn-notif" class="ghost-btn">🔔 알림 켜기</button>
-    <button id="btn-settings" class="ghost-btn">⚙ API 설정</button>
-  </div>
-</header>
 
-<nav class="tabs" role="tablist">
-  <button class="tab-btn active" data-tab="board">현황판</button>
-  <button class="tab-btn" data-tab="new">새 수행평가</button>
-  <button class="tab-btn" data-tab="archive">지난 기록</button>
-</nav>
-
-<main>
-
-  <section id="tab-board" class="tab-panel active">
-    <div class="stat-row">
-      <div class="stat-card">
-        <span class="stat-num" id="stat-total">0</span>
-        <span class="stat-label">등록된 수행평가</span>
+  <!-- API KEY 모달 -->
+  <div id="apiKeyModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+      <h3 class="text-base font-bold text-slate-900">Google Gemini API Key 설정</h3>
+      <p class="text-xs text-slate-500">Google AI Studio에서 무료로 발급받은 Gemini API Key를 입력하세요. 브라우저 내부(LocalStorage)에 안전하게 저장됩니다.</p>
+      <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full p-2.5 text-xs border rounded-lg border-slate-300 focus:outline-indigo-500">
+      <div class="flex justify-end gap-2">
+        <button onclick="closeModal('apiKeyModal')" class="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">취소</button>
+        <button onclick="saveApiKey()" class="px-3 py-1.5 text-xs bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700">저장</button>
       </div>
-      <div class="stat-card stat-warn">
-        <span class="stat-num" id="stat-soon">0</span>
-        <span class="stat-label">D-3 이내</span>
-      </div>
-      <div class="stat-card stat-done">
-        <span class="stat-num" id="stat-done">0</span>
-        <span class="stat-label">완료됨</span>
-      </div>
-    </div>
-
-    <div id="board-list" class="board-list"></div>
-
-    <p class="empty-hint" id="board-empty" hidden>
-      아직 등록된 수행평가가 없어요. <button class="link-btn" data-goto="new">여기서 하나 등록해 보세요 →</button>
-    </p>
-  </section>
-
-  <section id="tab-new" class="tab-panel">
-    <div class="form-card">
-      <h2>1. 기본 정보</h2>
-      <div class="grid-2">
-        <label>과목명
-          <input type="text" id="f-subject" placeholder="예: 통합과학" />
-        </label>
-        <label>유형
-          <select id="f-type">
-            <option value="writing">글쓰기 · 서술형</option>
-            <option value="presentation">발표</option>
-            <option value="experiment">실험 · 탐구</option>
-            <option value="etc">기타</option>
-          </select>
-        </label>
-      </div>
-      <label>제목
-        <input type="text" id="f-title" placeholder="예: 신소재 조사 및 활용 사례 발표" />
-      </label>
-      <label>수행일 / 마감일
-        <input type="date" id="f-due" />
-      </label>
-      <label>안내 내용 (유인물을 붙여넣거나 직접 입력)
-        <textarea id="f-desc" rows="4" placeholder="예: 초전도체/그래핀 중 1개 선택, 특성 및 실생활 적용 기술 3가지 정리, 3분 이내 구두 발표"></textarea>
-      </label>
-      <label>참고 파일 (PDF / TXT, 선택)
-        <input type="file" id="f-file" accept=".pdf,.txt" />
-      </label>
-      <p class="file-status" id="file-status"></p>
-
-      <button id="btn-save" class="primary-btn">등록하기</button>
-      <button id="btn-save-analyze" class="accent-btn">등록하고 AI 준비 도우미 실행 ✨</button>
-    </div>
-  </section>
-
-  <section id="tab-archive" class="tab-panel">
-    <h2>AI 준비 도우미 기록</h2>
-    <p class="muted">이 기기에 저장된 기록이에요. 언제든 다시 열어볼 수 있어요.</p>
-    <div id="archive-list" class="archive-list"></div>
-    <p class="empty-hint" id="archive-empty" hidden>아직 기록이 없어요.</p>
-  </section>
-
-</main>
-
-<div id="ai-modal" class="modal" hidden>
-  <div class="modal-box">
-    <div class="modal-head">
-      <h2 id="ai-modal-title">AI 준비 도우미</h2>
-      <button id="ai-modal-close" class="icon-btn">✕</button>
-    </div>
-    <div id="ai-modal-body" class="modal-body"></div>
-  </div>
-</div>
-
-<div id="settings-modal" class="modal" hidden>
-  <div class="modal-box modal-box-narrow">
-    <div class="modal-head">
-      <h2>API 설정</h2>
-      <button id="settings-modal-close" class="icon-btn">✕</button>
-    </div>
-    <div class="modal-body">
-      <p class="muted">
-        AI 분석 기능은 무료로 발급 가능한 Google Gemini API 키가 있어야 동작해요
-        (<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>에서
-        구글 계정으로 발급, 카드 등록 불필요). 키는 이 기기의 브라우저에만 저장되고 외부로
-        전송되지 않아요 (요청은 직접 Google 서버로만 보내져요).
-      </p>
-      <label>Gemini API Key
-        <input type="password" id="f-apikey" placeholder="AIza..." />
-      </label>
-      <p class="warn-box">
-        ⚠️ 브라우저에서 직접 API를 호출하는 방식은 개인 실습용이에요. 이 파일을 공개 웹사이트로
-        배포할 경우 키가 노출될 수 있으니, 본인만 쓰는 기기/브라우저에서만 입력하세요. 무료
-        등급 요청은 구글이 서비스 개선에 활용할 수 있다는 점도 참고하세요.
-      </p>
-      <button id="btn-save-key" class="primary-btn">저장</button>
     </div>
   </div>
-</div>
 
-<div id="toast" class="toast" hidden></div>
+  <script>
+    // 1. 상태 및 저장소 관리
+    let assessments = JSON.parse(localStorage.getItem('assessments') || '[]');
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script>
-/* ===================== store (localStorage) ===================== */
-const Store = (() => {
-  const KEYS = {
-    assessments: "ap_assessments",
-    history: "ap_history",
-    settings: "ap_settings",
-    notified: "ap_notified",
-  };
-  function read(key, fallback) {
-    try {
-      const raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : fallback;
-    } catch (e) {
-      console.error("저장소 읽기 실패:", key, e);
-      return fallback;
+    function saveAssessments() {
+      localStorage.setItem('assessments', JSON.stringify(assessments));
+      renderList();
+      checkD2Notifications();
     }
-  }
-  function write(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
 
-  function getAssessments() { return read(KEYS.assessments, []); }
-  function saveAssessment(assessment) {
-    const all = getAssessments();
-    const idx = all.findIndex((a) => a.id === assessment.id);
-    if (idx >= 0) all[idx] = assessment; else all.push(assessment);
-    write(KEYS.assessments, all);
-    return assessment;
-  }
-  function deleteAssessment(id) { write(KEYS.assessments, getAssessments().filter((a) => a.id !== id)); }
-  function getAssessment(id) { return getAssessments().find((a) => a.id === id) || null; }
-
-  function getHistory() { return read(KEYS.history, []); }
-  function addHistory(entry) {
-    const all = getHistory();
-    all.unshift(entry);
-    write(KEYS.history, all);
-    return entry;
-  }
-
-  function getSettings() { return read(KEYS.settings, { apiKey: "" }); }
-  function saveSettings(settings) { write(KEYS.settings, settings); }
-
-  function getNotified() { return read(KEYS.notified, {}); }
-  function markNotified(assessmentId, dayKey) {
-    const n = getNotified();
-    n[assessmentId] = dayKey;
-    write(KEYS.notified, n);
-  }
-
-  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
-
-  return {
-    getAssessments, saveAssessment, deleteAssessment, getAssessment,
-    getHistory, addHistory,
-    getSettings, saveSettings,
-    getNotified, markNotified,
-    uid,
-  };
-})();
-
-/* ===================== AI (Gemini) ===================== */
-const AI = (() => {
-  const TYPE_LABEL = {
-    writing: "글쓰기 · 서술형",
-    presentation: "발표",
-    experiment: "실험 · 탐구",
-    etc: "기타",
-  };
-
-  const TYPE_INSTRUCTIONS = {
-    writing: `이 학생은 글쓰기/서술형 수행평가를 준비하고 있습니다.
-- 먼저 서론-본론-결론 구조의 글쓰기 아웃라인을 문단별 핵심 문장과 함께 제시하세요.
-- 채점자가 좋아할 만한 논거 배치, 인용/근거 넣을 위치를 짚어주세요.
-- 마감일까지 남은 일수에 맞춰 "초안 작성 → 퇴고 → 분량/형식 점검" 단계별 준비 일정을 짜주세요.
-- 흔한 감점 요인(주제 이탈, 분량 미달, 결론 없이 끝남 등)을 피드백으로 알려주세요.`,
-    presentation: `이 학생은 발표 수행평가를 준비하고 있습니다.
-- 도입(주의 환기)-본론(핵심 근거 2~3개)-결론(요약/마무리 멘트) 구조로 발표 개요를 짜주세요.
-- 슬라이드가 필요하다면 슬라이드별로 들어갈 내용을 한 줄씩 제시하세요.
-- 제한 시간이 언급되어 있다면 그 시간에 맞춘 분량으로 조절하세요.
-- 마감일까지 "자료조사 → 대본 작성 → 리허설 → 시간 체크" 단계별 준비 일정을 짜주세요.
-- 발표 특유의 감점 요인(시간 초과, 눈맞춤 없이 읽기, 근거 부족)에 대한 피드백을 주세요.`,
-    experiment: `이 학생은 실험/탐구 수행평가를 준비하고 있습니다.
-- 실험의 가설-준비물-절차-예상 결과-주의사항을 항목별로 정리하세요.
-- 보고서를 쓴다면 보고서 목차(가설/방법/결과/고찰)도 함께 제시하세요.
-- 마감일까지 "준비물 확인 → 실험/관찰 → 결과 정리 → 보고서 작성" 단계별 준비 일정을 짜주세요.
-- 실험 특유의 감점 요인(안전수칙 누락, 변인 통제 실패, 고찰 부실)에 대한 피드백을 주세요.`,
-    etc: `이 학생은 위 내용의 수행평가를 준비하고 있습니다.
-- 과제 내용을 분석해서 요구사항을 항목별로 정리하세요.
-- 마감일까지 남은 일수에 맞춰 단계별 준비 일정을 짜주세요.
-- 놓치기 쉬운 감점 요인에 대한 피드백을 주세요.`,
-  };
-
-  function buildPrompt(assessment, extraSourceText) {
-    const daysLeft = daysUntil(assessment.due);
-    return `너는 한국 고등학생의 수행평가 준비를 도와주는 선생님이야. 아래 정보를 바탕으로 답해줘.
-
-[과목] ${assessment.subject || "미상"}
-[제목] ${assessment.title || "미상"}
-[유형] ${TYPE_LABEL[assessment.type] || "기타"}
-[마감일까지 남은 일수] ${daysLeft}일
-[안내 내용]
-${assessment.desc || "(안내 내용 없음)"}
-${extraSourceText ? `\n[업로드된 유인물/자료 내용]\n${extraSourceText.slice(0, 6000)}` : ""}
-
-${TYPE_INSTRUCTIONS[assessment.type] || TYPE_INSTRUCTIONS.etc}
-
-반드시 아래 형식의 순수 JSON 객체 하나만 출력해. 코드블록, 설명, 다른 텍스트를 절대 붙이지 마.
-{
-  "outline": "마크다운 형식의 아웃라인/구조 (## 소제목 사용 가능)",
-  "schedule": [ {"label": "짧은 단계 이름", "detail": "무엇을 할지 한 줄 설명"} ],
-  "feedback": "이 유형에서 흔히 감점되는 부분과 이번 과제에서 특히 주의할 점 (2~4문장)"
-}
-"schedule" 배열은 남은 일수에 맞춰 2~5단계로 구성해줘.`;
-  }
-
-  function daysUntil(dueStr) {
-    if (!dueStr) return "미정";
-    const due = new Date(dueStr + "T00:00:00");
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return Math.round((due - today) / 86400000);
-  }
-
-  // 무료 등급 모델. Google이 모델명을 바꾸면 이 값만 교체하면 됩니다.
-  const GEMINI_MODEL = "gemini-3.1-flash-lite";
-
-  async function callGemini(prompt) {
-    const { apiKey } = Store.getSettings();
-    if (!apiKey) throw new Error("NO_API_KEY");
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.7 },
-      }),
-    });
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new Error(`API_ERROR_${res.status}: ${text.slice(0, 300)}`);
+    function getApiKey() {
+      return localStorage.getItem('gemini_api_key') || '';
     }
-    const data = await res.json();
-    const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("\n").trim();
-    if (!text) throw new Error("API_ERROR_EMPTY: 모델이 빈 응답을 반환했어요.");
-    return parseJsonReply(text);
-  }
 
-  function parseJsonReply(text) {
-    const cleaned = text.replace(/^```json/i, "").replace(/```$/, "").trim();
-    try { return JSON.parse(cleaned); }
-    catch (e) { return { outline: text, schedule: [], feedback: "" }; }
-  }
-
-  async function prepareAssessment(assessment, extraSourceText) {
-    const prompt = buildPrompt(assessment, extraSourceText);
-    return await callGemini(prompt);
-  }
-
-  async function extractFileText(file) {
-    if (!file) return "";
-    if (file.type === "text/plain" || file.name.endsWith(".txt")) return await file.text();
-    if (file.type === "application/pdf" || file.name.endsWith(".pdf")) return await extractPdfText(file);
-    return "";
-  }
-
-  async function extractPdfText(file) {
-    if (typeof pdfjsLib === "undefined") return "";
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-    const buf = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-    let out = "";
-    const maxPages = Math.min(pdf.numPages, 10);
-    for (let i = 1; i <= maxPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      out += content.items.map((it) => it.str).join(" ") + "\n";
+    function openApiKeyModal() {
+      document.getElementById('apiKeyInput').value = getApiKey();
+      document.getElementById('apiKeyModal').classList.remove('hidden');
     }
-    return out;
-  }
 
-  return { prepareAssessment, extractFileText, daysUntil, TYPE_LABEL };
-})();
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
 
-/* ===================== notifications ===================== */
-const Notifier = (() => {
-  function init() {
-    checkAll();
-    setInterval(checkAll, 30 * 60 * 1000);
-  }
-  async function requestPermission() {
-    if (!("Notification" in window)) { alert("이 브라우저는 알림을 지원하지 않아요."); return false; }
-    const perm = await Notification.requestPermission();
-    return perm === "granted";
-  }
-  function fire(title, body) {
-    if (Notification.permission !== "granted") return;
-    new Notification(title, { body });
-  }
-  function todayKey() { return new Date().toISOString().slice(0, 10); }
-  function checkAll() {
-    if (!("Notification" in window) || Notification.permission !== "granted") return;
-    const assessments = Store.getAssessments();
-    const notified = Store.getNotified();
-    const key = todayKey();
-    assessments.forEach((a) => {
-      if (a.status === "done") return;
-      const d = AI.daysUntil(a.due);
-      if (d === 2 && notified[a.id] !== key) {
-        fire(`D-2 · ${a.subject || "수행평가"}`, `${a.title || "제목 없음"} 이(가) 이틀 뒤예요. 지금 준비 상황을 확인해 보세요.`);
-        Store.markNotified(a.id, key);
+    function saveApiKey() {
+      const key = document.getElementById('apiKeyInput').value.trim();
+      localStorage.setItem('gemini_api_key', key);
+      closeModal('apiKeyModal');
+      alert('API Key가 성공적으로 저장되었습니다.');
+    }
+
+    // 2. 알림 기능 (브라우저 푸시 알림)
+    function requestNotificationPermission() {
+      if ('Notification' in window) {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            alert('D-2 수행평가 알림 설정이 완료되었습니다.');
+            checkD2Notifications();
+          } else {
+            alert('알림 권한이 거부되었습니다.');
+          }
+        });
+      } else {
+        alert('이 브라우저는 알림 기능을 지원하지 않습니다.');
       }
-    });
-  }
-  return { init, requestPermission, checkAll };
-})();
-
-/* ===================== app (UI) ===================== */
-document.addEventListener("DOMContentLoaded", () => {
-  Notifier.init();
-  bindTabs();
-  bindSettings();
-  bindNotifButton();
-  bindForm();
-  bindModals();
-  renderBoard();
-  renderArchive();
-});
-
-function bindTabs() {
-  document.querySelectorAll(".tab-btn").forEach((btn) => {
-    btn.addEventListener("click", () => switchTab(btn.dataset.tab));
-  });
-  document.querySelectorAll("[data-goto]").forEach((btn) => {
-    btn.addEventListener("click", () => switchTab(btn.dataset.goto));
-  });
-}
-function switchTab(name) {
-  document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
-  document.querySelectorAll(".tab-panel").forEach((p) => p.classList.toggle("active", p.id === `tab-${name}`));
-}
-
-function bindSettings() {
-  const modal = document.getElementById("settings-modal");
-  document.getElementById("btn-settings").addEventListener("click", () => {
-    document.getElementById("f-apikey").value = Store.getSettings().apiKey || "";
-    modal.hidden = false;
-  });
-  document.getElementById("settings-modal-close").addEventListener("click", () => (modal.hidden = true));
-  document.getElementById("btn-save-key").addEventListener("click", () => {
-    const key = document.getElementById("f-apikey").value.trim();
-    Store.saveSettings({ apiKey: key });
-    modal.hidden = true;
-    showToast("API 키를 저장했어요.");
-  });
-}
-
-function bindNotifButton() {
-  const btn = document.getElementById("btn-notif");
-  btn.addEventListener("click", async () => {
-    const ok = await Notifier.requestPermission();
-    if (ok) {
-      btn.textContent = "🔔 알림 켜짐";
-      Notifier.checkAll();
-      showToast("D-2 알림을 켰어요. 이 브라우저를 열어두면 알려드려요.");
-    } else {
-      showToast("알림 권한이 꺼져 있어요. 브라우저 설정에서 허용해 주세요.");
     }
-  });
-  if ("Notification" in window && Notification.permission === "granted") btn.textContent = "🔔 알림 켜짐";
-}
 
-function bindForm() {
-  const fileInput = document.getElementById("f-file");
-  fileInput.addEventListener("change", () => {
-    const f = fileInput.files[0];
-    document.getElementById("file-status").textContent = f ? `첨부됨: ${f.name}` : "";
-  });
-  document.getElementById("btn-save").addEventListener("click", async () => { await saveFromForm(false); });
-  document.getElementById("btn-save-analyze").addEventListener("click", async () => { await saveFromForm(true); });
-}
+    function checkD2Notifications() {
+      if (Notification.permission !== 'granted') return;
 
-function readForm() {
-  return {
-    subject: document.getElementById("f-subject").value.trim(),
-    type: document.getElementById("f-type").value,
-    title: document.getElementById("f-title").value.trim(),
-    due: document.getElementById("f-due").value,
-    desc: document.getElementById("f-desc").value.trim(),
-  };
-}
-function clearForm() {
-  ["f-subject", "f-title", "f-due", "f-desc"].forEach((id) => (document.getElementById(id).value = ""));
-  document.getElementById("f-type").selectedIndex = 0;
-  document.getElementById("f-file").value = "";
-  document.getElementById("file-status").textContent = "";
-}
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-async function saveFromForm(runAI) {
-  const form = readForm();
-  if (!form.title) { showToast("제목을 입력해 주세요."); return; }
-  const assessment = { id: Store.uid(), ...form, checklist: [], status: "active", createdAt: new Date().toISOString() };
-  Store.saveAssessment(assessment);
-  const file = document.getElementById("f-file").files[0];
-  clearForm();
-  renderBoard();
-  switchTab("board");
-  showToast("수행평가를 등록했어요.");
+      assessments.forEach(item => {
+        if (item.completed) return;
+        
+        const due = new Date(item.dueDate);
+        due.setHours(0, 0, 0, 0);
+        
+        const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
 
-  if (runAI) {
-    let fileText = "";
-    if (file) {
-      showToast("첨부 파일을 읽는 중...");
-      try { fileText = await AI.extractFileText(file); } catch (e) { console.error(e); }
+        // D-2인 경우 알림 발송 (중복 방지)
+        if (diffDays === 2 && !item.notified) {
+          new Notification(`[수행평가 D-2 알림] ${item.subject}`, {
+            body: `"${item.title}" 마감까지 2일 남았습니다! AI 피드백을 확인하고 준비하세요.`,
+            icon: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+          });
+          item.notified = true;
+        }
+      });
+      localStorage.setItem('assessments', JSON.stringify(assessments));
     }
-    await runAssistant(assessment.id, fileText);
-  }
-}
 
-function renderBoard() {
-  const all = Store.getAssessments();
-  const list = document.getElementById("board-list");
-  const empty = document.getElementById("board-empty");
-  list.innerHTML = "";
-  empty.hidden = all.length > 0;
+    // 3. AI 분석 요청 (유형별 피드백 로직)
+    async function handleAnalyze(e) {
+      e.preventDefault();
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        alert('먼저 상단의 [API 키 설정]에서 Gemini API Key를 등록해주세요.');
+        openApiKeyModal();
+        return;
+      }
 
-  document.getElementById("stat-total").textContent = all.length;
-  document.getElementById("stat-soon").textContent = all.filter(
-    (a) => a.status !== "done" && typeof AI.daysUntil(a.due) === "number" && AI.daysUntil(a.due) <= 3 && AI.daysUntil(a.due) >= 0
-  ).length;
-  document.getElementById("stat-done").textContent = all.filter((a) => a.status === "done").length;
+      const type = document.getElementById('typeSelect').value;
+      const subject = document.getElementById('subjectInput').value.trim();
+      const dueDate = document.getElementById('dueDateInput').value;
+      const content = document.getElementById('contentInput').value.trim();
 
-  const sorted = [...all].sort((a, b) => {
-    const da = a.due ? new Date(a.due) : new Date("2999-01-01");
-    const db = b.due ? new Date(b.due) : new Date("2999-01-01");
-    return da - db;
-  });
-  sorted.forEach((a) => list.appendChild(renderBoardItem(a)));
-}
+      const submitBtn = document.getElementById('submitBtn');
+      const btnText = document.getElementById('btnText');
+      submitBtn.disabled = true;
+      btnText.innerText = 'AI가 맞춤 피드백 및 아웃라인 생성 중...';
 
-function renderBoardItem(a) {
-  const el = document.createElement("div");
-  const d = AI.daysUntil(a.due);
-  const isUrgent = typeof d === "number" && d <= 2 && d >= 0 && a.status !== "done";
-  el.className = "board-item" + (isUrgent ? " urgent" : "") + (a.status === "done" ? " done" : "");
+      // 유형별 AI 시스템 프롬프트 분기 (글쓰기, 발표, 실험 등)
+      let promptTypeInstruction = '';
+      if (type === '글쓰기') {
+        promptTypeInstruction = `작성 유형: [글쓰기/서술형/서평].
+다음 순서로 답변을 작성하세요:
+1. 글 전체 개요 및 아웃라인 (서론-본론-결론 구성안)
+2. 반드시 포함해야 할 핵심 키워드 및 표현 3가지
+3. D-Day까지의 일별 단계별 작성 가이드`;
+      } else if (type === '발표') {
+        promptTypeInstruction = `작성 유형: [발표/PT].
+다음 순서로 답변을 작성하세요:
+1. 발표 슬라이드/구조 아웃라인 (도입-전개-마무리)
+2. 청중을 사로잡을 발표 대본 팁 및 스피치 포인트
+3. 3분/5분 분량 조절 가이드 및 준비 체크리스트`;
+      } else if (type === '실험') {
+        promptTypeInstruction = `작성 유형: [실험/탐구보고서].
+다음 순서로 답변을 작성하세요:
+1. 탐구 보고서 목차 아웃라인 (동기-가설-실험과정-결과분석-결론)
+2. 데이터 분석 및 오차 분석 시 유의할 점
+3. 탐구 보고서 필수 작성 요소 및 일자별 가이드`;
+      } else {
+        promptTypeInstruction = `작성 유형: [일반 수행평가].
+다음 순서로 답변을 작성하세요:
+1. 수행평가 성공 제출 전략
+2. 단계별 준비 일정 (Step-by-Step)
+3. 감점 예방 체크리스트`;
+      }
 
-  const total = a.checklist.length;
-  const doneCount = a.checklist.filter((c) => c.done).length;
-  const pct = total ? Math.round((doneCount / total) * 100) : 0;
+      const fullPrompt = `당신은 고등학교 수행평가 전문 AI 코치입니다.
+과목: ${subject}
+마감일: ${dueDate}
+요청 내용: ${content}
 
-  el.innerHTML = `
-    <div class="board-item-head">
-      <div class="board-item-title">
-        ${a.subject ? `<span class="chip subject">${escapeHtml(a.subject)}</span>` : ""}
-        <span class="chip type-${a.type}">${AI.TYPE_LABEL[a.type] || "기타"}</span>
-      </div>
-      <span class="dday ${badgeClass(d, a.status)}">${ddayLabel(d, a.status)}</span>
-    </div>
-    <h3>${escapeHtml(a.title)}</h3>
-    ${a.desc ? `<p>${escapeHtml(a.desc)}</p>` : ""}
-    ${total ? `
-      <div class="progress-row">
-        <div class="progress-bar"><span style="width:${pct}%"></span></div>
-        <span class="progress-pct">${pct}%</span>
-      </div>
-      <div class="checklist">
-        ${a.checklist.map((c) => `
-          <label>
-            <input type="checkbox" data-assessment="${a.id}" data-item="${c.id}" ${c.done ? "checked" : ""}/>
-            <span><strong>${escapeHtml(c.label)}</strong>${c.detail ? " — " + escapeHtml(c.detail) : ""}</span>
-          </label>`).join("")}
-      </div>` : `<p class="muted">아직 준비 일정이 없어요. 아래 버튼으로 AI 도우미를 실행해 보세요.</p>`}
-    <div class="item-actions">
-      <button class="ghost-btn" data-action="ai" data-id="${a.id}">✨ AI 준비 도우미</button>
-      ${a.status !== "done" ? `<button class="ghost-btn" data-action="done" data-id="${a.id}">완료로 표시</button>` : `<button class="ghost-btn" data-action="undone" data-id="${a.id}">완료 취소</button>`}
-      <button class="ghost-btn" data-action="delete" data-id="${a.id}">삭제</button>
-    </div>
-  `;
+${promptTypeInstruction}
 
-  el.querySelectorAll('input[type=checkbox]').forEach((cb) => {
-    cb.addEventListener("change", () => toggleChecklistItem(a.id, cb.dataset.item, cb.checked));
-  });
-  el.querySelector('[data-action="ai"]').addEventListener("click", () => runAssistant(a.id, ""));
-  const doneBtn = el.querySelector('[data-action="done"]');
-  if (doneBtn) doneBtn.addEventListener("click", () => setStatus(a.id, "done"));
-  const undoneBtn = el.querySelector('[data-action="undone"]');
-  if (undoneBtn) undoneBtn.addEventListener("click", () => setStatus(a.id, "active"));
-  el.querySelector('[data-action="delete"]').addEventListener("click", () => {
-    if (confirm("이 수행평가를 삭제할까요? 관련 기록은 남아있어요.")) {
-      Store.deleteAssessment(a.id);
-      renderBoard();
+학생이 이해하기 쉽고 명확하게 한국어로 답변하세요.`;
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: fullPrompt }] }]
+          })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error?.message || 'AI 분석 실패');
+
+        const aiFeedback = data.candidates[0].content.parts[0].text;
+
+        // 새 수행평가 항목 저장
+        const newItem = {
+          id: Date.now(),
+          type,
+          subject,
+          dueDate,
+          content,
+          aiFeedback,
+          completed: false,
+          notified: false,
+          createdAt: new Date().toLocaleDateString()
+        };
+
+        assessments.unshift(newItem);
+        saveAssessments();
+
+        // 폼 초기화
+        document.getElementById('assessmentForm').reset();
+        alert('성공적으로 AI 분석이 완료되고 수행평가가 등록되었습니다!');
+      } catch (err) {
+        alert('오류 발생: ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        btnText.innerText = 'AI 분석 & 일정 등록하기';
+      }
     }
-  });
-  return el;
-}
 
-function badgeClass(d, status) {
-  if (status === "done") return "past";
-  if (typeof d !== "number") return "normal";
-  if (d < 0) return "past";
-  if (d <= 2) return "soon";
-  return "normal";
-}
-function ddayLabel(d, status) {
-  if (status === "done") return "완료";
-  if (typeof d !== "number") return "날짜 미정";
-  if (d === 0) return "D-DAY";
-  if (d < 0) return `${-d}일 지남`;
-  return `D-${d}`;
-}
+    // 4. UI 렌더링
+    function renderList() {
+      const container = document.getElementById('listContainer');
+      container.innerHTML = '';
 
-function toggleChecklistItem(assessmentId, itemId, checked) {
-  const a = Store.getAssessment(assessmentId);
-  if (!a) return;
-  const item = a.checklist.find((c) => c.id === itemId);
-  if (item) item.done = checked;
-  Store.saveAssessment(a);
-  renderBoard();
-}
-function setStatus(assessmentId, status) {
-  const a = Store.getAssessment(assessmentId);
-  if (!a) return;
-  a.status = status;
-  Store.saveAssessment(a);
-  renderBoard();
-}
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-async function runAssistant(assessmentId, extraSourceText) {
-  const a = Store.getAssessment(assessmentId);
-  if (!a) return;
+      let ongoingCount = 0;
+      let doneCount = 0;
 
-  if (!Store.getSettings().apiKey) {
-    showToast("먼저 ⚙ API 설정에서 Gemini API 키를 입력해 주세요.");
-    document.getElementById("settings-modal").hidden = false;
-    return;
-  }
+      if (assessments.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-400 text-xs">
+            <i class="fa-regular fa-folder-open text-3xl mb-2 text-slate-300"></i>
+            <p>등록된 수행평가가 없습니다. 왼쪽에서 새 수행평가를 분석해보세요!</p>
+          </div>`;
+      }
 
-  openAiModal(`✨ ${a.title} 준비 도우미`, `<p class="loading-line">AI가 내용을 분석하고 있어요...</p>`);
+      assessments.forEach(item => {
+        if (item.completed) doneCount++;
+        else ongoingCount++;
 
-  try {
-    const result = await AI.prepareAssessment(a, extraSourceText);
+        const due = new Date(item.dueDate);
+        due.setHours(0, 0, 0, 0);
+        const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
 
-    const prevDone = new Map(a.checklist.map((c) => [c.label, c.done]));
-    a.checklist = (result.schedule || []).map((s) => ({
-      id: Store.uid(),
-      label: s.label || "단계",
-      detail: s.detail || "",
-      done: prevDone.get(s.label) || false,
-    }));
-    Store.saveAssessment(a);
-    renderBoard();
+        let dDayBadge = '';
+        if (item.completed) {
+          dDayBadge = `<span class="bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded">완료됨</span>`;
+        } else if (diffDays < 0) {
+          dDayBadge = `<span class="bg-rose-100 text-rose-600 text-[10px] font-bold px-2 py-0.5 rounded">마감됨</span>`;
+        } else if (diffDays === 0) {
+          dDayBadge = `<span class="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse">D-Day</span>`;
+        } else if (diffDays <= 2) {
+          dDayBadge = `<span class="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">D-${diffDays} (임박)</span>`;
+        } else {
+          dDayBadge = `<span class="bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded">D-${diffDays}</span>`;
+        }
 
-    Store.addHistory({
-      id: Store.uid(),
-      assessmentId: a.id,
-      assessmentTitle: a.title,
-      subject: a.subject,
-      type: a.type,
-      outline: result.outline || "",
-      feedback: result.feedback || "",
-      schedule: result.schedule || [],
-      createdAt: new Date().toISOString(),
-    });
-    renderArchive();
-    renderAiResult(a, result);
-  } catch (e) {
-    console.error(e);
-    let msg = "AI 분석 중 오류가 발생했어요.";
-    if (String(e.message).includes("NO_API_KEY")) msg = "API 키가 필요해요. ⚙ API 설정에서 입력해 주세요.";
-    else if (String(e.message).includes("API_ERROR")) msg = "Gemini API 호출에 실패했어요: " + e.message;
-    document.getElementById("ai-modal-body").innerHTML = `<p class="loading-line">${escapeHtml(msg)}</p>`;
-  }
-}
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-xl border transition ${item.completed ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-white border-slate-200 hover:border-indigo-300 shadow-sm'}`;
 
-function renderAiResult(assessment, result) {
-  const body = document.getElementById("ai-modal-body");
-  const outlineHtml = mdLiteToHtml(result.outline || "");
-  const scheduleHtml = (result.schedule || [])
-    .map((s) => `<li><strong>${escapeHtml(s.label)}</strong> — ${escapeHtml(s.detail || "")}</li>`)
-    .join("");
-  body.innerHTML = `
-    <h4>구조 / 아웃라인</h4>
-    ${outlineHtml}
-    <h4>준비 일정</h4>
-    <ol>${scheduleHtml}</ol>
-    <h4>${AI.TYPE_LABEL[assessment.type]} 피드백</h4>
-    <p>${escapeHtml(result.feedback || "")}</p>
-  `;
-}
+        card.innerHTML = `
+          <div class="flex justify-between items-start mb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md">${item.subject}</span>
+              <span class="text-xs font-semibold text-slate-800">${item.type}</span>
+              ${dDayBadge}
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="toggleComplete(${item.id})" class="text-xs text-slate-400 hover:text-emerald-600">
+                <i class="fa-solid ${item.completed ? 'fa-circle-check text-emerald-600' : 'fa-circle'}"></i>
+              </button>
+              <button onclick="deleteAssessment(${item.id})" class="text-xs text-slate-400 hover:text-rose-500">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          
+          <p class="text-xs text-slate-600 mb-3 line-clamp-2">${item.content}</p>
 
-function mdLiteToHtml(md) {
-  const lines = md.split("\n");
-  let html = "";
-  let inList = false;
-  lines.forEach((line) => {
-    const t = line.trim();
-    if (t.startsWith("## ")) {
-      if (inList) { html += "</ul>"; inList = false; }
-      html += `<h4>${escapeHtml(t.slice(3))}</h4>`;
-    } else if (t.startsWith("- ")) {
-      if (!inList) { html += "<ul>"; inList = true; }
-      html += `<li>${escapeHtml(t.slice(2))}</li>`;
-    } else if (t === "") {
-      if (inList) { html += "</ul>"; inList = false; }
-    } else {
-      if (inList) { html += "</ul>"; inList = false; }
-      html += `<p>${escapeHtml(t)}</p>`;
+          <div class="flex justify-between items-center border-t pt-2.5 mt-2">
+            <span class="text-[11px] text-slate-400">마감: ${item.dueDate}</span>
+            <button onclick="showDetail(${item.id})" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+              AI 분석 & 개요 보기 <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      // 통계 업데이트
+      document.getElementById('statTotal').innerText = assessments.length + '개';
+      document.getElementById('statOngoing').innerText = ongoingCount + '개';
+      document.getElementById('statDone').innerText = doneCount + '개';
     }
-  });
-  if (inList) html += "</ul>";
-  return html;
-}
 
-function renderArchive() {
-  const all = Store.getHistory();
-  const list = document.getElementById("archive-list");
-  const empty = document.getElementById("archive-empty");
-  list.innerHTML = "";
-  empty.hidden = all.length > 0;
+    function toggleComplete(id) {
+      assessments = assessments.map(item => item.id === id ? { ...item, completed: !item.completed } : item);
+      saveAssessments();
+    }
 
-  all.forEach((h) => {
-    const el = document.createElement("div");
-    el.className = "archive-item";
-    const date = new Date(h.createdAt).toLocaleString("ko-KR", { dateStyle: "medium", timeStyle: "short" });
-    el.innerHTML = `
-      <div class="archive-item-head">
-        <span>${h.subject ? escapeHtml(h.subject) + " · " : ""}${AI.TYPE_LABEL[h.type] || "기타"}</span>
-        <span>${date}</span>
-      </div>
-      <h3>${escapeHtml(h.assessmentTitle || "제목 없음")}</h3>
-    `;
-    el.addEventListener("click", () => {
-      openAiModal(`📁 ${h.assessmentTitle}`, "");
-      renderAiResult({ type: h.type }, h);
-    });
-    list.appendChild(el);
-  });
-}
+    function deleteAssessment(id) {
+      if (confirm('정말 삭제하시겠습니까?')) {
+        assessments = assessments.filter(item => item.id !== id);
+        saveAssessments();
+      }
+    }
 
-function bindModals() {
-  document.getElementById("ai-modal-close").addEventListener("click", () => {
-    document.getElementById("ai-modal").hidden = true;
-  });
-}
-function openAiModal(title, bodyHtml) {
-  document.getElementById("ai-modal-title").textContent = title;
-  document.getElementById("ai-modal-body").innerHTML = bodyHtml;
-  document.getElementById("ai-modal").hidden = false;
-}
+    function showDetail(id) {
+      const item = assessments.find(i => i.id === id);
+      if (!item) return;
 
-let toastTimer = null;
-function showToast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.hidden = false;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => (t.hidden = true), 3200);
-}
+      document.getElementById('modalSubject').innerText = `${item.subject} (${item.type})`;
+      document.getElementById('modalTitle').innerText = `${item.subject} 수행평가 준비 가이드`;
+      document.getElementById('modalContent').innerText = item.aiFeedback;
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
 
-function escapeHtml(str) {
-  return String(str || "").replace(/[&<>"']/g, (c) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-  }[c]));
-}
-</script>
+    // 초기화
+    renderList();
+    checkD2Notifications();
+  </script>
 </body>
 </html>
